@@ -25,6 +25,46 @@ function getArticles($conn)
     }
     return $articles;
 }
+
+// Hàm để lấy 5 bài viết mới nhất cho phần main
+function getMainArticles($conn, $limit = 5)
+{
+    $sql = "SELECT articles.*, article_categories.name AS category_name 
+            FROM articles 
+            LEFT JOIN article_categories ON articles.category_id = article_categories.id 
+            ORDER BY publish_date DESC 
+            LIMIT ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $articles = [];
+    while ($row = $result->fetch_assoc()) {
+        $articles[] = $row;
+    }
+    return $articles;
+}
+
+// Hàm để lấy bài viết theo category_id
+function getArticlesByCategory($conn, $category_id, $limit = 4)
+{
+    $sql = "SELECT articles.*, article_categories.name AS category_name 
+            FROM articles 
+            LEFT JOIN article_categories ON articles.category_id = article_categories.id 
+            WHERE articles.category_id = ? 
+            ORDER BY publish_date DESC 
+            LIMIT ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $category_id, $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $articles = [];
+    while ($row = $result->fetch_assoc()) {
+        $articles[] = $row;
+    }
+    return $articles;
+}
+
 // Lấy chi tiết bài viết
 function getDetail($conn, $id)
 {
@@ -67,7 +107,7 @@ function uploadImage($file, $targetDir)
     if (isset($file) && $file['error'] == 0) {
         $timestamp = time();
         $imageFileType = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $validExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+        $validExtensions = ['jpg', 'jpeg', 'png', 'gif' , 'avif', 'webp'];
 
         if (!in_array($imageFileType, $validExtensions)) {
             return '';
@@ -130,7 +170,16 @@ switch ($action) {
     case 'get':
         echo json_encode(getArticles($conn));
         break;
+    case 'getMainArticles':
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 5;
+        echo json_encode(getMainArticles($conn, $limit));
+        break;
 
+    case 'getArticlesByCategory':
+        $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 4;
+        echo json_encode(getArticlesByCategory($conn, $category_id, $limit));
+        break;
     case 'create':
         $title = $_POST['title'] ?? '';
         $excerpt = $_POST['excerpt'] ?? '';

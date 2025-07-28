@@ -4,7 +4,7 @@
          <div class="row">
              <!-- License information column -->
              <div class="col-lg-4 mb-4">
-                 <h3 class="mb-3" style="color: white;">Insightful </h3>
+                 <h3 class="mb-3" style="color: var(--dark-blue); font-weight:700;">Insightful </h3>
                  <p class="license-info">
                      Giấy phép ĐKD số G314B5-496 do Sở KH & ĐT cấp ngày 06/01/2017.
                  </p>

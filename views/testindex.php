@@ -4,11 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insigtful</title>
+    <title>AdNews Vietnam</title>
     <link rel="stylesheet" href="../public/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="icon" type="image/png" href="/public/images/logo.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- jQuery cần được load trước khi dùng $ -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -19,7 +17,7 @@
     include '../views/header.php';
     ?>
     <div id="home-page">
-        <div class="container-custom  mt-4">
+        <div class="container-custom mw-993 mt-4">
             <div class="row">
                 <div class="col-md-8 pl-0 pr-0">
                     <!-- Main Content Section -->
@@ -77,32 +75,27 @@
 
         // Hàm tạo HTML cho main article
         function createMainArticleHTML(article) {
-
             return `
                 <div class="col-12 col-md-8 mt-24">
-                    <div class="main-article">
-                        <img class = "w-100" src="/public/images/articles/${article.image_url}" alt="${article.title}" >
-                        <a href = "#" class="overlay-bg"></a>
-                        <div class="thumbnail-describe">
-                            <a href = "#"><h2 class="line-clamp-2">${article.title}</h2></a> 
-                            <h4 class="line-clamp-2">${article.excerpt}</h4>
-                            <div class="article-meta">
-                                <div class="author-info">
+                    <div class="main-article" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/public/images/articles/${article.image_url}');">
+                        <h2 class="mb-3">${article.title}</h2>
+                        <p class="mb-4">${article.excerpt}</p>
+                        <div class="article-meta">
+                            <div class="author-info">
                                 <img src="/public/images/authors/${article.author_avatar}" alt="Author" class="author-avatar">
                                 <div>
                                     <div style="color: white; font-weight: 500;">${article.author_name}</div>
                                     <div style="color: #ccc;">${formatDate(article.publish_date)}</div>
                                 </div>
-                                </div>
-                                <div class="engagement-stats">
-                                <span class="text-white"><i class="fas fa-thumbs-up"></i> 3</span>
-                                <span class="text-white"><i class="fas fa-comment"></i> 0</span>
-                                <span class="text-white"><i class="fas fa-bookmark"></i></span>
-                                </div>
+                            </div>
+                            <div class="engagement-stats">
+                                <span><i class="fas fa-thumbs-up"></i> 3</span>
+                                <span><i class="fas fa-comment"></i> 0</span>
+                                <span><i class="fas fa-bookmark"></i></span>
                             </div>
                         </div>
                     </div>
-                    </div>
+                </div>
             `;
         }
 
@@ -111,10 +104,10 @@
             return `
                 <div class="col-6 col-md-4 mt-24">
                     <div class="article-card">
-                        <a href = "#"><img src="/public/images/articles/${article.image_url}" alt="Article" class="article-image"></a>
+                        <img src="/public/images/articles/${article.image_url}" alt="Article" class="article-image">
                         <div class="article-content">
-                            <a href = "#"><h3 class="article-title line-clamp-2">${article.title}</h3></a>
-                            <p class="article-excerpt line-clamp-2">${article.excerpt}</p>
+                            <h3 class="article-title">${article.title}</h3>
+                            <p class="article-excerpt">${article.excerpt}</p>
                             <div class="article-meta">
                                 <div class="author-info">
                                     <img src="/public/images/authors/${article.author_avatar}" alt="Author" class="author-avatar">
@@ -138,10 +131,11 @@
         function createSmallArticleHTML(article) {
             return `
                 <div class="small-article">
-                    <a href="#"><img src="/public/images/articles/${article.image_url}" alt="Article" class="small-article-image"></a>
-                    <a href="#" class="small-article-content">
-                        <h4 class="small-article-title line-clamp-4">${article.title}</h4>
-                    </a>
+                    <img src="/public/images/articles/${article.image_url}" alt="Article" class="small-article-image">
+                    <div class="small-article-content">
+                        <h4 class="small-article-title">${article.title}</h4>
+                        <div class="small-article-meta">${article.author_name} • ${formatDate(article.publish_date)}</div>
+                    </div>
                 </div>
             `;
         }
@@ -209,7 +203,7 @@
                                                 <div class="col-12">
                                                     <div class="d-flex justify-content-between align-items-center mb-4">
                                                         <h2 class="section-title">${category.name}</h2>
-                                                        <a href="category.php?id=${category.id}" class="see-all" style = "font-weight: 700;">
+                                                        <a href="#" class="see-all">
                                                             Tất cả <i class="fas fa-arrow-right"></i>
                                                         </a>
                                                     </div>
@@ -221,10 +215,10 @@
                                         if (articles[0]) {
                                             sectionHTML += `
                                                 <div class="article-card">
-                                                    <a href = "#"><img src="/public/images/articles/${articles[0].image_url}" alt="Article" class="article-image"></a>
+                                                    <img src="/public/images/articles/${articles[0].image_url}" alt="Article" class="article-image">
                                                     <div class="article-content">
-                                                        <a href = "#"><h3 class="article-title line-clamp-2">${articles[0].title}</h3></a>
-                                                        <p class="article-excerpt line-clamp-2">${articles[0].excerpt}</p>
+                                                        <h3 class="article-title">${articles[0].title}</h3>
+                                                        <p class="article-excerpt">${articles[0].excerpt}</p>
                                                         <div class="article-meta">
                                                             <div class="author-info">
                                                                 <img src="/public/images/authors/${articles[0].author_avatar}" alt="Author" class="author-avatar">
