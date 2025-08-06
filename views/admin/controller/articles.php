@@ -65,6 +65,7 @@ function getArticlesByCategory($conn, $category_id, $limit = 4)
     return $articles;
 }
 
+
 // Lấy chi tiết bài viết
 function getDetail($conn, $id)
 {
@@ -107,7 +108,7 @@ function uploadImage($file, $targetDir)
     if (isset($file) && $file['error'] == 0) {
         $timestamp = time();
         $imageFileType = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $validExtensions = ['jpg', 'jpeg', 'png', 'gif' , 'avif', 'webp'];
+        $validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'avif', 'webp'];
 
         if (!in_array($imageFileType, $validExtensions)) {
             return '';
@@ -163,6 +164,38 @@ function deleteCategory($conn, $id)
     return $stmt->affected_rows;
 }
 
+// Hàm lấy bài viết theo danh mục với phân trang
+function getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offset) {
+    $sql = "SELECT articles.*, article_categories.name AS category_name 
+            FROM articles 
+            LEFT JOIN article_categories ON articles.category_id = article_categories.id 
+            WHERE articles.category_id = ? 
+            ORDER BY publish_date DESC 
+            LIMIT ? OFFSET ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iii", $category_id, $limit, $offset);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $articles = [];
+    while ($row = $result->fetch_assoc()) {
+        $articles[] = $row;
+    }
+
+    // Lấy tổng số bài viết
+    $countSql = "SELECT COUNT(*) as total FROM articles WHERE category_id = ?";
+    $countStmt = $conn->prepare($countSql);
+    $countStmt->bind_param("i", $category_id);
+    $countStmt->execute();
+    $countResult = $countStmt->get_result();
+    $total = $countResult->fetch_assoc()['total'];
+
+    return [
+        'articles' => $articles,
+        'total' => $total
+    ];
+}
+
+
 // Xử lý yêu cầu AJAX
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 
@@ -180,6 +213,19 @@ switch ($action) {
         $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 4;
         echo json_encode(getArticlesByCategory($conn, $category_id, $limit));
         break;
+    case 'getArticlesByCategoryWithPagination':
+    $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
+    $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 15;
+    $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
+
+    if ($category_id <= 0) {
+        echo json_encode(['articles' => [], 'total' => 0]);
+        break;
+    }
+
+    $result = getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offset);
+    echo json_encode($result);
+    break;
     case 'create':
         $title = $_POST['title'] ?? '';
         $excerpt = $_POST['excerpt'] ?? '';

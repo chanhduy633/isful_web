@@ -1,3 +1,8 @@
+<?php
+// Include file xử lý authentication
+require 'auth_processing.php';
+?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -6,17 +11,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insigtful</title>
     <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="../public/css/auth.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="icon" type="image/png" href="/public/images/logo.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- jQuery cần được load trước khi dùng $ -->
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
     <?php
     include '../views/header.php';
+    include '../views/login.php';
+
     ?>
     <div id="home-page">
         <div class="container-custom  mt-4">
@@ -45,20 +55,20 @@
                 include '../views/sidebar.php';
                 ?>
             </div>
-
-
-
-
         </div>
-
     </div>
+   
+    <!-- Footer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/sidebar.js"></script>
     <?php
     include '../views/footer.php';
     ?>
 
     <script>
+        
         // Load trang khi document ready
         $(document).ready(function() {
             loadMainArticles();
@@ -82,9 +92,9 @@
                 <div class="col-12 col-md-8 mt-24">
                     <div class="main-article">
                         <img class = "w-100" src="/public/images/articles/${article.image_url}" alt="${article.title}" >
-                        <a href = "#" class="overlay-bg"></a>
+                        <a href = "article-detail.php?id=${article.id}" class="overlay-bg"></a>
                         <div class="thumbnail-describe">
-                            <a href = "#"><h2 class="line-clamp-2">${article.title}</h2></a> 
+                            <a href = "article-detail.php?id=${article.id}"><h2 class="line-clamp-2">${article.title}</h2></a> 
                             <h4 class="line-clamp-2">${article.excerpt}</h4>
                             <div class="article-meta">
                                 <div class="author-info">
@@ -111,9 +121,9 @@
             return `
                 <div class="col-6 col-md-4 mt-24">
                     <div class="article-card">
-                        <a href = "#"><img src="/public/images/articles/${article.image_url}" alt="Article" class="article-image"></a>
+                        <a href = "article-detail.php?id=${article.id}"><img src="/public/images/articles/${article.image_url}" alt="Article" class="article-image"></a>
                         <div class="article-content">
-                            <a href = "#"><h3 class="article-title line-clamp-2">${article.title}</h3></a>
+                            <a href = "article-detail.php?id=${article.id}"><h3 class="article-title line-clamp-2">${article.title}</h3></a>
                             <p class="article-excerpt line-clamp-2">${article.excerpt}</p>
                             <div class="article-meta">
                                 <div class="author-info">
@@ -138,8 +148,8 @@
         function createSmallArticleHTML(article) {
             return `
                 <div class="small-article">
-                    <a href="#"><img src="/public/images/articles/${article.image_url}" alt="Article" class="small-article-image"></a>
-                    <a href="#" class="small-article-content">
+                    <a href="article-detail.php?id=${article.id}"><img src="/public/images/articles/${article.image_url}" alt="Article" class="small-article-image"></a>
+                    <a href="article-detail.php?id=${article.id}" class="small-article-content">
                         <h4 class="small-article-title line-clamp-4">${article.title}</h4>
                     </a>
                 </div>
@@ -205,9 +215,9 @@
                                 success: function(articles) {
                                     if (articles && articles.length > 0) {
                                         let sectionHTML = `
-                                            <div class="row mt-4">
+                                            <div class="row">
                                                 <div class="col-12">
-                                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                                    <div class="section-header d-flex justify-content-between align-items-center">
                                                         <h2 class="section-title">${category.name}</h2>
                                                         <a href="category.php?id=${category.id}" class="see-all" style = "font-weight: 700;">
                                                             Tất cả <i class="fas fa-arrow-right"></i>
@@ -221,9 +231,9 @@
                                         if (articles[0]) {
                                             sectionHTML += `
                                                 <div class="article-card">
-                                                    <a href = "#"><img src="/public/images/articles/${articles[0].image_url}" alt="Article" class="article-image"></a>
+                                                    <a href = "article-detail.php?id=${articles[0].id}"><img src="/public/images/articles/${articles[0].image_url}" alt="Article" class="article-image"></a>
                                                     <div class="article-content">
-                                                        <a href = "#"><h3 class="article-title line-clamp-2">${articles[0].title}</h3></a>
+                                                        <a href = "article-detail.php?id=${articles[0].id}"><h3 class="article-title line-clamp-2">${articles[0].title}</h3></a>
                                                         <p class="article-excerpt line-clamp-2">${articles[0].excerpt}</p>
                                                         <div class="article-meta">
                                                             <div class="author-info">
@@ -275,6 +285,8 @@
                 }
             });
         }
+
+        
     </script>
 </body>
 

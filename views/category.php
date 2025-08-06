@@ -1,87 +1,222 @@
 <?php
+require 'auth_processing.php';
 // --- category.php ---
-
-// 1. Lấy ID danh mục từ URL
+// Lấy ID danh mục và trang hiện tại từ URL
 $category_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-// Bạn có thể lấy tên danh mục từ API sau, hoặc nếu cần SEO tốt hơn, có thể truy vấn trước ở đây.
-// Để đơn giản, ta sẽ lấy tên từ API trong JS.
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1; // Đảm bảo trang >= 1
+$limit = 15; // Số bài viết mỗi trang
+$offset = ($page - 1) * $limit;
 ?>
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh mục - AdNews Vietnam</title> <!-- Tiêu đề tạm thời, sẽ được cập nhật sau -->
+    <title>Insigtful</title>
+    <link rel="icon" type="image/png" href="/public/images/logo.png">
     <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="../public/css/auth.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery cần được load trước script -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* Thêm CSS cơ bản cho trạng thái loading và lỗi */
-        .loading, .error-message {
-            text-align: center;
-            padding: 20px;
-        }
-        .article-placeholder {
-            height: 200px; /* Chiều cao placeholder */
-            background-color: #f0f0f0;
-            margin-bottom: 20px;
+        /* --- Giữ nguyên CSS như cũ --- */
+        .category-hero {
+            position: relative;
+            height: 200px;
+            background: url("https://advertisingvietnam.com/cdn-cgi/image/width=825,height=265,quality=75,fit=cover,format=auto/https://media-api.advertisingvietnam.com/oapi/v1/media?uuid=a0efffad-d631-42b4-a4d5-78e298285e2a");
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #999;
+            margin-bottom: 40px;
+            border-radius: 15px;
+            overflow: hidden;
         }
-        .line-clamp-2, .line-clamp-4 {
-             /* Đảm bảo CSS cho line-clamp có hiệu lực */
+
+        .category-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: black center/cover;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .category-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: white;
+        }
+
+        .category-hero h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .category-hero .category-description {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+
+        .engagement-stats span {
+            color: #999;
+            margin-right: 6px;
+        }
+
+        .engagement-stats i {
+            margin-right: 5px;
+        }
+
+        .loading,
+        .error-message {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .article-title {
             display: -webkit-box;
-            -webkit-line-clamp: 2; /* hoặc 4 */
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+
+
+        .article-excerpt {
+
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .pagination-wrapper {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pagination .page-link {
+            border: none;
+            color: #667eea;
+            font-weight: 500;
+            margin: 0 5px;
+            border-radius: 8px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f8f9ff;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .category-hero h1 {
+                font-size: 2rem;
+            }
+
+            .category-hero {
+                height: 200px;
+            }
+        }
     </style>
 </head>
+
 <body>
     <?php
     include '../views/header.php';
+    include '../views/login.php';
+
     ?>
+
     <div id="category-page">
         <div class="container-custom mt-4">
             <div class="row">
-                <!-- Main Content Area for Articles -->
-                <div class="col-md-8 pl-0 pr-0">
-                    <h1 id="category-title">Đang tải danh mục...</h1> <!-- Tiêu đề sẽ được cập nhật -->
-                    <div id="category-articles">
-                         <!-- Placeholder loading -->
-                        <div class="loading">
-                            <div class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading articles...</span>
-                            </div>
+                <!-- Main Content Area -->
+                <div class="col-md-8">
+                    <!-- Category Hero Section -->
+                    <div class="category-hero">
+                        <div class="category-hero-content">
+                            <h1 id="category-title">Đang tải...</h1>
+                            <div class="category-description" id="category-description">Khám phá những bài viết mới nhất</div>
                         </div>
                     </div>
-                     <!-- Phân trang có thể được thêm ở đây -->
+                    <div id="category-articles">
+                        <!-- Loading placeholders -->
+                        <div class="row" id="loading-placeholders">
+                            <?php for ($i = 0; $i < 3; $i++): ?>
+                                <div class="col-md-4 mb-4">
+                                    <div class="article-placeholder"></div>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-wrapper" id="pagination-wrapper" style="display: none;">
+                        <nav aria-label="Phân trang danh mục">
+                            <ul class="pagination" id="pagination-nav"></ul>
+                        </nav>
+                    </div>
                 </div>
 
                 <!-- Sidebar -->
-                <?php
-                include '../views/sidebar.php';
-                ?>
+                <?php include '../views/sidebar.php'; ?>
             </div>
         </div>
     </div>
 
-    <?php
-    include '../views/footer.php';
-    ?>
+    <?php include '../views/footer.php'; ?>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
+    <script src="../public/js/auth.js"></script>
+    <script src="../public/js/sidebar.js"></script>
     <script>
-        // URL của controller
         const API_URL = '/views/admin/controller/articles.php';
-        // ID danh mục từ PHP
         const categoryId = <?php echo json_encode($category_id); ?>;
-        let categoryName = '';
+        const ARTICLES_PER_PAGE = <?php echo $limit; ?>;
+        let currentPage = <?php echo $page; ?>;
+        let totalPages = 1;
 
-        // Hàm format ngày tháng (giữ nguyên từ index.php)
+        // Định dạng ngày
         function formatDate(dateString) {
             const date = new Date(dateString);
             const options = {
@@ -92,27 +227,31 @@ $category_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
             return date.toLocaleDateString('vi-VN', options);
         }
 
-        // Hàm tạo HTML cho article card (dạng danh sách)
-        function createArticleListItemHTML(article) {
+        // Tạo HTML bài viết
+        function createArticleCardHTML(article) {
             return `
-                <div class="col-12 mb-4"> <!-- Mỗi bài viết chiếm 1 dòng -->
-                    <div class="article-card d-flex"> <!-- Sử dụng flexbox để xếp hình ảnh và nội dung ngang hàng -->
-                        <a href="#">
-                            <img src="/public/images/articles/${article.image_url}" alt="${article.title}" class="article-image" style="width: 200px; height: auto; object-fit: cover; margin-right: 15px;">
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="article-card">
+                        <a href="article-detail.php?id=${article.id}">
+                            <img src="/public/images/articles/${article.image_url}" 
+                                 alt="${article.title}" class="article-image">
                         </a>
                         <div class="article-content">
-                            <a href="#"><h3 class="article-title line-clamp-2">${article.title}</h3></a>
-                            <p class="article-excerpt line-clamp-2">${article.excerpt}</p>
-                            <div class="article-meta d-flex justify-content-between align-items-center flex-wrap">
+                            <a href="article-detail.php?id=${article.id}" class="article-title">
+                                ${article.title}
+                            </a>
+                            <p class="article-excerpt">${article.excerpt}</p>
+                            <div class="article-meta d-flex justify-content-between align-items-center">
                                 <div class="author-info d-flex align-items-center">
-                                    <img src="/public/images/authors/${article.author_avatar}" alt="Author" class="author-avatar me-2" style="width: 30px; height: 30px; border-radius: 50%;">
+                                    <img src="/public/images/authors/${article.author_avatar}" 
+                                         alt="Tác giả" class="author-avatar ">
                                     <div>
-                                        <div style="font-weight: 500;">${article.author_name}</div>
-                                        <div>${formatDate(article.publish_date)}</div>
+                                        <div style="font-weight: 600; font-size: 0.7rem;">${article.author_name}</div>
+                                        <div style="font-size: 0.6rem; color: #999;">${formatDate(article.publish_date)}</div>
                                     </div>
                                 </div>
                                 <div class="engagement-stats">
-                                    <span class="me-3"><i class="fas fa-thumbs-up"></i> 4</span>
+                                    <span><i class="fas fa-thumbs-up"></i> 4</span>
                                     <span><i class="fas fa-comment"></i> 0</span>
                                 </div>
                             </div>
@@ -122,92 +261,175 @@ $category_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
             `;
         }
 
+        // Tạo phân trang
+        function createPaginationHTML(currentPage, totalPages) {
+            if (totalPages <= 1) return '';
+            let html = '';
 
-        // Hàm tải tên danh mục
-        function loadCategoryName() {
+            if (currentPage > 1) {
+                html += `<li class="page-item">
+                    <a class="page-link" href="#" data-page="${currentPage - 1}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>`;
+            }
+
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                html += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
+                if (startPage > 2) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                </li>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+                html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
+            }
+
+            if (currentPage < totalPages) {
+                html += `<li class="page-item">
+                    <a class="page-link" href="#" data-page="${currentPage + 1}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>`;
+            }
+
+            return html;
+        }
+
+        // Hiển thị danh mục
+        function loadCategoryInfo() {
             if (categoryId <= 0) {
-                 $('#category-title').text('Danh mục không hợp lệ');
-                 $('#category-articles').html('<div class="error-message">ID danh mục không hợp lệ.</div>');
-                 return;
+                $('#category-title').text('Danh mục không hợp lệ');
+                $('#category-articles').html('<div class="error-message alert alert-danger">ID danh mục không hợp lệ.</div>');
+                return;
             }
 
             $.ajax({
                 url: API_URL,
                 method: 'POST',
                 data: {
-                    action: 'getCategories' // Lấy tất cả danh mục
+                    action: 'getCategories'
                 },
                 dataType: 'json',
                 success: function(categories) {
-                    if (categories && Array.isArray(categories)) {
-                        const category = categories.find(cat => parseInt(cat.id) === categoryId);
-                        if (category) {
-                            categoryName = category.name;
-                            $('#category-title').text(categoryName);
-                            document.title = categoryName + ' - AdNews Vietnam'; // Cập nhật tiêu đề trang
-                             loadArticles(); // Sau khi có tên, tải bài viết
-                        } else {
-                            $('#category-title').text('Danh mục không tồn tại');
-                            $('#category-articles').html('<div class="error-message">Không tìm thấy danh mục với ID đã cho.</div>');
-                        }
+                    const category = categories.find(cat => parseInt(cat.id) === categoryId);
+                    if (category) {
+                        $('#category-title').text(category.name);
+                        $('#category-description').text(category.description || 'Khám phá những bài viết mới nhất');
+                        document.title = `${category.name} - AdNews Vietnam`;
+                        loadArticles(currentPage);
                     } else {
-                         $('#category-title').text('Lỗi tải danh mục');
-                         $('#category-articles').html('<div class="error-message">Dữ liệu danh mục không hợp lệ.</div>');
+                        showError('Không tìm thấy danh mục.');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error("Lỗi khi tải danh mục:", status, error);
-                    $('#category-title').text('Lỗi');
-                    $('#category-articles').html('<div class="error-message">Không thể tải thông tin danh mục.</div>');
+                error: function() {
+                    showError('Không thể tải thông tin danh mục.');
                 }
             });
         }
 
-        // Hàm tải bài viết theo danh mục
-        function loadArticles() {
+        // Tải bài viết theo danh mục và phân trang
+        function loadArticles(page = 1) {
             $('#category-articles').html(`
-                <div class="loading">
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading articles...</span>
-                    </div>
+                <div class="row">
+                    ${Array.from({length: 3}, () => ` <
+                div class = "col-md-4 mb-4" >
+                <
+                div class = "article-placeholder" > < /div> < /
+                div >
+                `).join('')}
                 </div>
-            `); // Hiển thị loading trước khi gửi request
+            `);
+            $('#pagination-wrapper').hide();
 
             $.ajax({
                 url: API_URL,
                 method: 'POST',
                 data: {
-                    action: 'getArticlesByCategory',
-                    category_id: categoryId
-                    // Có thể thêm limit, offset cho phân trang sau
+                    action: 'getArticlesByCategoryWithPagination',
+                    category_id: categoryId,
+                    limit: ARTICLES_PER_PAGE,
+                    offset: (page - 1) * ARTICLES_PER_PAGE
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log("Dữ liệu bài viết nhận được:", response); // Debug
-                    let html = '';
-                    if (response && Array.isArray(response) && response.length > 0) {
-                        html += '<div class="row">';
-                        response.forEach(function(article) {
-                            html += createArticleListItemHTML(article);
-                        });
-                        html += '</div>';
-                         $('#category-articles').html(html);
+                    if (response && response.articles && Array.isArray(response.articles)) {
+                        displayArticles(response.articles);
+                        totalPages = Math.ceil(response.total / ARTICLES_PER_PAGE);
+                        if (totalPages > 1) {
+                            displayPagination(page, totalPages);
+                        }
+                        // Cập nhật URL
+                        const newUrl = `${window.location.pathname}?id=${categoryId}&page=${page}`;
+                        window.history.pushState({
+                            page
+                        }, '', newUrl);
                     } else {
-                         $('#category-articles').html('<div class="alert alert-info">Không có bài viết nào trong danh mục này.</div>');
+                        $('#category-articles').html('<div class="alert alert-info text-center">Chưa có bài viết nào.</div>');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error("Lỗi khi tải bài viết:", status, error);
-                    $('#category-articles').html('<div class="error-message alert alert-danger">Không thể tải bài viết. Vui lòng thử lại sau.</div>');
+                error: function() {
+                    showError('Không thể tải bài viết.');
                 }
             });
         }
 
-        // Load trang khi document ready
-        $(document).ready(function() {
-            loadCategoryName(); // Bắt đầu bằng việc tải tên danh mục
+        function displayArticles(articles) {
+            let html = '<div class="row">';
+            if (articles.length > 0) {
+                articles.forEach(article => {
+                    html += createArticleCardHTML(article);
+                });
+            } else {
+                html += '<div class="col-12"><div class="alert alert-info text-center">Không có bài viết nào trong danh mục này.</div></div>';
+            }
+            html += '</div>';
+            $('#category-articles').html(html);
+        }
+
+        function displayPagination(currentPage, totalPages) {
+            $('#pagination-nav').html(createPaginationHTML(currentPage, totalPages));
+            $('#pagination-wrapper').show();
+        }
+
+        function showError(message) {
+            $('#category-articles').html(`<div class="error-message alert alert-danger text-center">${message}</div>`);
+        }
+
+        // Xử lý click phân trang
+        $(document).on('click', '.pagination .page-link', function(e) {
+            e.preventDefault();
+            const page = $(this).data('page');
+            if (page && page !== currentPage) {
+                currentPage = page;
+                loadArticles(page);
+            }
         });
 
+        // Hỗ trợ nút back/forward trình duyệt
+        window.addEventListener('popstate', function(e) {
+            const page = e.state?.page || 1;
+            currentPage = page;
+            loadArticles(page);
+        });
+
+        // Khởi tạo
+        $(document).ready(function() {
+            loadCategoryInfo();
+        });
     </script>
 </body>
+
 </html>

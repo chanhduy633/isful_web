@@ -1,0 +1,305 @@
+/* auth.css - Styling cho authentication components */
+
+/* User Avatar & Header */
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  border-radius: 25px;
+  transition: background-color 0.2s ease;
+}
+
+.user-info:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.user-name {
+  font-weight: 500;
+  color: #333;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-toggle::after {
+  content: none!important;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Modal Styling */
+.modal-content {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 15px 15px 0 0;
+  padding: 20px 30px;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.modal-body {
+  padding: 30px;
+}
+
+.modal-footer {
+  padding: 20px 30px;
+  background-color: #f8f9fa;
+  border-radius: 0 0 15px 15px;
+}
+
+/* Form Styling */
+.form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 2px solid #e9ecef;
+  padding: 12px 15px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-control.is-invalid {
+  border-color: #dc3545;
+}
+
+/* Button Styling */
+.auth-buttons {
+  line-height: 1.5;
+  font-weight: 200;
+  color: var(--dark-blue);
+}
+.btn-auth {
+  background: transparent;
+  border: none;
+  font-weight: 700 !important;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  color: #059669 !important;
+  padding: 0 !important;
+}
+
+.btn-auth:hover {
+  color: var(--dark-blue) !important;
+}
+
+.btn-outline-primary {
+  color: #667eea;
+  border: 2px solid #667eea;
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: #667eea;
+  border-color: #667eea;
+  transform: translateY(-1px);
+}
+
+/* Google Sign-In Button Customization */
+.g_id_signin {
+  margin: 0 auto;
+  border-radius: 10px !important;
+  overflow: hidden;
+}
+
+/* Alert Styling */
+.alert {
+  border-radius: 10px;
+  border: none;
+  padding: 15px 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  padding: 10px 0;
+  margin-top: 10px;
+}
+
+.dropdown-item {
+  padding: 12px 20px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.dropdown-item i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Divider Styling */
+.modal-body hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+  margin: 0;
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal.fade .modal-dialog {
+  transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .modal-body {
+    padding: 20px;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+  }
+
+  .modal-footer {
+    padding: 15px 20px;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .user-name {
+    display: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    background-color: #2d3748;
+    color: white;
+  }
+
+  .form-control {
+    background-color: #4a5568;
+    border-color: #4a5568;
+    color: white;
+  }
+
+  .form-control:focus {
+    background-color: #4a5568;
+    border-color: #667eea;
+    color: white;
+  }
+
+  .modal-footer {
+    background-color: #1a202c;
+  }
+
+  .dropdown-menu {
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+  }
+
+  .dropdown-item {
+    color: white;
+  }
+}
+
+/* Accessibility improvements */
+.btn:focus,
+.form-control:focus,
+.dropdown-item:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
+}
+
+/* Invalid feedback styling */
+.invalid-feedback {
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+/* Loading states */
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}

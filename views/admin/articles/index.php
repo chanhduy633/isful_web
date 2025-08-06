@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Thêm Quill.js CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    
+
     <style>
         /* Custom styles for content display */
         .content-preview {
@@ -16,7 +16,7 @@
             overflow: hidden;
             position: relative;
         }
-        
+
         .content-preview::after {
             content: "";
             position: absolute;
@@ -26,46 +26,51 @@
             width: 100%;
             background: linear-gradient(transparent, white);
         }
-        
+
         .full-content {
             max-height: none;
         }
-        
+
         .full-content::after {
             display: none;
         }
-        
+
         /* Highlight styles */
         .highlight-yellow {
             background-color: #ffeb3b;
             padding: 2px 4px;
         }
-        
+
         .highlight-green {
             background-color: #4caf50;
             color: white;
             padding: 2px 4px;
         }
-        
+
         .highlight-blue {
             background-color: #2196f3;
             color: white;
             padding: 2px 4px;
         }
-        
+
         /* Rich text editor container */
         #editor-container {
             height: 300px;
         }
-        
+
         /* Table responsive */
         .table-container {
             overflow-x: auto;
         }
-        
+
         .content-cell {
             min-width: 200px;
             max-width: 300px;
+        }
+
+        #fullContentView img {
+            width: 100%;
+            border-radius: 8px;
         }
     </style>
 </head>
@@ -112,7 +117,7 @@
                 <div class="modal-body">
                     <form id="articleForm" enctype="multipart/form-data">
                         <input type="hidden" id="articleId">
-                        
+
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="form-label">Tiêu đề</label>
@@ -123,7 +128,7 @@
                                 <input class="form-control mb-3" type="date" id="publish_date">
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Trích dẫn</label>
                             <textarea class="form-control" id="excerpt" rows="2" placeholder="Nhập trích dẫn ngắn"></textarea>
@@ -202,11 +207,11 @@
 
     <script>
         let quill;
-        
+
         $(document).ready(function() {
             // Khởi tạo Quill Editor
             initQuillEditor();
-            
+
             loadCategories();
             loadArticles();
 
@@ -224,7 +229,7 @@
                 // Lấy nội dung HTML từ Quill editor
                 const htmlContent = quill.root.innerHTML;
                 $('#content').val(htmlContent);
-                
+
                 let articleId = $('#articleId').val().trim();
                 let action = articleId ? 'update' : 'create';
 
@@ -274,26 +279,56 @@
 
         function initQuillEditor() {
             const toolbarOptions = [
-                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                ['bold', 'italic', 'underline', 'strike'], // toggled buttons
                 ['blockquote', 'code-block'],
-                
-                [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-                [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-                [{ 'direction': 'rtl' }],                         // text direction
-                
-                [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                
-                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-                [{ 'font': [] }],
-                [{ 'align': [] }],
-                
+
+                [{
+                    'header': 1
+                }, {
+                    'header': 2
+                }], // custom button values
+                [{
+                    'list': 'ordered'
+                }, {
+                    'list': 'bullet'
+                }],
+                [{
+                    'script': 'sub'
+                }, {
+                    'script': 'super'
+                }], // superscript/subscript
+                [{
+                    'indent': '-1'
+                }, {
+                    'indent': '+1'
+                }], // outdent/indent
+                [{
+                    'direction': 'rtl'
+                }], // text direction
+
+                [{
+                    'size': ['small', false, 'large', 'huge']
+                }], // custom dropdown
+                [{
+                    'header': [1, 2, 3, 4, 5, 6, false]
+                }],
+
+                [{
+                    'color': []
+                }, {
+                    'background': []
+                }], // dropdown with defaults from theme
+                [{
+                    'font': []
+                }],
+                [{
+                    'align': []
+                }],
+
                 ['link', 'image', 'video'],
-                ['clean']                                         // remove formatting button
+                ['clean'] // remove formatting button
             ];
-            
+
             quill = new Quill('#editor-container', {
                 modules: {
                     toolbar: toolbarOptions
@@ -323,12 +358,12 @@
                 data.forEach(a => {
                     let title = a.title.length > 30 ? a.title.substring(0, 30) + '...' : a.title;
                     let excerpt = a.excerpt.length > 50 ? a.excerpt.substring(0, 50) + '...' : a.excerpt;
-                    
+
                     // Hiển thị nội dung HTML với preview và nút xem thêm
-                    let contentPreview = stripHtml(a.content).length > 100 ? 
-                        stripHtml(a.content).substring(0, 100) + '...' : 
+                    let contentPreview = stripHtml(a.content).length > 100 ?
+                        stripHtml(a.content).substring(0, 100) + '...' :
                         stripHtml(a.content);
-                    
+
                     let imagePath = `/public/images/articles/${a.image_url}`;
 
                     rows += `<tr>
@@ -392,25 +427,25 @@
                 $('#articleId').val(a.id);
                 $('#title').val(a.title);
                 $('#excerpt').val(a.excerpt);
-                
+
                 // Set nội dung vào Quill editor
                 quill.root.innerHTML = a.content;
-                
+
                 $('#author_name').val(a.author_name);
                 $('#publish_date').val(a.publish_date);
                 $('#category_id').val(parseInt(a.category_id));
-                
+
                 // Hiển thị ảnh hiện tại
                 if (a.image_url) {
                     $('#current-image').show();
                     $('#current-image-preview').attr('src', `/public/images/articles/${a.image_url}`);
                 }
-                
+
                 if (a.author_avatar) {
                     $('#current-avatar').show();
                     $('#current-avatar-preview').attr('src', `/public/images/authors/${a.author_avatar}`);
                 }
-                
+
                 $('#modalCreate').modal('show');
             });
         }
