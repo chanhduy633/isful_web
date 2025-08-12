@@ -23,17 +23,27 @@ $offset = ($page - 1) * $limit;
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* --- Giữ nguyên CSS như cũ --- */
+        :root {
+            --primary-color: #000;
+            --secondary-color: #f8f9fa;
+            --accent-color: #dc3545;
+            --dark-blue: #012169;
+            --mint-green: #00af50;
+        }
+
         .category-hero {
             position: relative;
             height: 200px;
-            background: url("https://advertisingvietnam.com/cdn-cgi/image/width=825,height=265,quality=75,fit=cover,format=auto/https://media-api.advertisingvietnam.com/oapi/v1/media?uuid=a0efffad-d631-42b4-a4d5-78e298285e2a");
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 40px;
             border-radius: 15px;
             overflow: hidden;
+            background-color: #000;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
         }
 
         .category-hero::before {
@@ -44,7 +54,7 @@ $offset = ($page - 1) * $limit;
             right: 0;
             bottom: 0;
             background: black center/cover;
-            opacity: 0.3;
+            opacity: 0.4;
             z-index: 1;
         }
 
@@ -63,9 +73,8 @@ $offset = ($page - 1) * $limit;
         }
 
         .category-hero .category-description {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             margin-top: 10px;
-            opacity: 0.9;
         }
 
 
@@ -131,21 +140,25 @@ $offset = ($page - 1) * $limit;
         }
 
         .pagination .page-link {
-            border: none;
-            color: #667eea;
+            border: 1px solid #ccc;
+            background-color: transparent;
+            color: var(--mint-green);
             font-weight: 500;
             margin: 0 5px;
             border-radius: 8px;
         }
 
         .pagination .page-item.active .page-link {
-            background-color: #667eea;
-            border-color: #667eea;
+            background-color: var(--mint-green);
+            border-color: var(--mint-green);
+            color: #fff;
+
         }
 
         .pagination .page-link:hover {
-            background-color: #f8f9ff;
-            color: #667eea;
+            background-color: var(--mint-green);
+            color: #fff;
+            opacity: 0.4;
         }
 
         @media (max-width: 768px) {
@@ -209,6 +222,7 @@ $offset = ($page - 1) * $limit;
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/sidebar.js"></script>
+    <script src="../public/js/search.js"></script>
     <script>
         const API_URL = '/views/admin/controller/articles.php';
         const categoryId = <?php echo json_encode($category_id); ?>;
@@ -252,7 +266,7 @@ $offset = ($page - 1) * $limit;
                                 </div>
                                 <div class="engagement-stats">
                                     <span><i class="fas fa-thumbs-up"></i> 4</span>
-                                    <span><i class="fas fa-comment"></i> 0</span>
+                                    <span><i class="fas fa-share"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -308,11 +322,13 @@ $offset = ($page - 1) * $limit;
             return html;
         }
 
-        // Hiển thị danh mục
+        // Hiển thị danh mục (có ảnh nền)
         function loadCategoryInfo() {
             if (categoryId <= 0) {
                 $('#category-title').text('Danh mục không hợp lệ');
+                $('#category-description').text('Danh mục không hợp lệ.');
                 $('#category-articles').html('<div class="error-message alert alert-danger">ID danh mục không hợp lệ.</div>');
+                $('.category-hero').css('background-image', ''); // Xóa ảnh nền
                 return;
             }
 
@@ -326,16 +342,30 @@ $offset = ($page - 1) * $limit;
                 success: function(categories) {
                     const category = categories.find(cat => parseInt(cat.id) === categoryId);
                     if (category) {
+                        // Cập nhật tiêu đề và mô tả
                         $('#category-title').text(category.name);
-                        $('#category-description').text(category.description || 'Khám phá những bài viết mới nhất');
-                        document.title = `${category.name} - AdNews Vietnam`;
+                        $('#category-description').text(category.category_description || 'Khám phá những bài viết mới nhất');
+                        document.title = `${category.name} - Insightful`;
+
+                        // Cập nhật ảnh nền cho .category-hero
+                        if (category.category_img) {
+                            const imgUrl = `/public/images/categories/${encodeURIComponent(category.category_img)}`;
+                            $('.category-hero').css('background-image', `url('${imgUrl}')`);
+                        } else {
+                            // Ảnh dự phòng nếu không có
+                            $('.category-hero').css('background-image', 'url(/public/images/categories/default.jpg)');
+                        }
+
+                        // Tải bài viết sau khi có danh mục
                         loadArticles(currentPage);
                     } else {
                         showError('Không tìm thấy danh mục.');
+                        $('.category-hero').css('background-image', 'url(/public/images/categories/default.jpg)');
                     }
                 },
                 error: function() {
                     showError('Không thể tải thông tin danh mục.');
+                    $('.category-hero').css('background-image', 'url(/public/images/categories/default.jpg)');
                 }
             });
         }

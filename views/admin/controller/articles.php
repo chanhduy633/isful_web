@@ -74,7 +74,15 @@ function getDetail($conn, $id)
     $stmt->execute();
     return $stmt->get_result()->fetch_assoc();
 }
-
+// Hàm để lấy chi tiết danh mục theo ID
+function getDetailCategory($conn, $id)
+{
+    $stmt = $conn->prepare("SELECT * FROM article_categories WHERE id = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->fetch_assoc();
+}
 // Hàm để thêm bài viết
 function createArticle($conn, $title, $excerpt, $content, $image_url, $author_name, $author_avatar, $publish_date, $category_id)
 {
@@ -138,19 +146,34 @@ function getCategories($conn)
 }
 
 // Hàm để thêm danh mục
-function createCategory($conn, $name)
+function createCategory($conn, $name, $category_img = '', $category_description = '')
 {
-    $stmt = $conn->prepare("INSERT INTO article_categories (name) VALUES (?)");
-    $stmt->bind_param("s", $name);
+    $stmt = $conn->prepare("INSERT INTO article_categories (name, category_img, category_description) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $name, $category_img, $category_description);
     $stmt->execute();
     return $stmt->affected_rows;
 }
 
 // Hàm để sửa danh mục theo ID
-function updateCategory($conn, $id, $name)
+function updateCategory($conn, $id, $name, $category_img = null, $category_description = null)
 {
-    $stmt = $conn->prepare("UPDATE article_categories SET name = ? WHERE id = ?");
-    $stmt->bind_param("si", $name, $id);
+    if ($category_img !== null && $category_description !== null) {
+        // Cập nhật cả ảnh và mô tả
+        $stmt = $conn->prepare("UPDATE article_categories SET name = ?, category_img = ?, category_description = ? WHERE id = ?");
+        $stmt->bind_param("sssi", $name, $category_img, $category_description, $id);
+    } else if ($category_img !== null) {
+        // Chỉ cập nhật ảnh
+        $stmt = $conn->prepare("UPDATE article_categories SET name = ?, category_img = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $name, $category_img, $id);
+    } else if ($category_description !== null) {
+        // Chỉ cập nhật mô tả
+        $stmt = $conn->prepare("UPDATE article_categories SET name = ?, category_description = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $name, $category_description, $id);
+    } else {
+        // Chỉ cập nhật tên
+        $stmt = $conn->prepare("UPDATE article_categories SET name = ? WHERE id = ?");
+        $stmt->bind_param("si", $name, $id);
+    }
     $stmt->execute();
     return $stmt->affected_rows;
 }
@@ -165,7 +188,8 @@ function deleteCategory($conn, $id)
 }
 
 // Hàm lấy bài viết theo danh mục với phân trang
-function getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offset) {
+function getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offset)
+{
     $sql = "SELECT articles.*, article_categories.name AS category_name 
             FROM articles 
             LEFT JOIN article_categories ON articles.category_id = article_categories.id 
@@ -195,7 +219,40 @@ function getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offse
     ];
 }
 
+function searchArticles($conn, $keyword)
+{
+    if (empty($keyword)) {
+        return [];
+    }
 
+    // Chuẩn hóa từ khóa: chuyển về chữ thường để tìm kiếm không phân biệt chữ hoa
+    $searchTerm = '%' . strtolower(trim($keyword)) . '%';
+
+    $sql = "SELECT 
+                articles.*, 
+                article_categories.name AS category_name 
+            FROM articles 
+            LEFT JOIN article_categories ON articles.category_id = article_categories.id 
+            WHERE 
+                LOWER(articles.title) LIKE ? OR
+                LOWER(articles.excerpt) LIKE ? OR
+                LOWER(articles.content) LIKE ? OR
+                LOWER(article_categories.name) LIKE ?
+            ORDER BY 
+                publish_date DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssss", $searchTerm, $searchTerm, $searchTerm, $searchTerm);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $articles = [];
+    while ($row = $result->fetch_assoc()) {
+        $articles[] = $row;
+    }
+
+    return $articles;
+}
 // Xử lý yêu cầu AJAX
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 
@@ -214,18 +271,18 @@ switch ($action) {
         echo json_encode(getArticlesByCategory($conn, $category_id, $limit));
         break;
     case 'getArticlesByCategoryWithPagination':
-    $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
-    $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 15;
-    $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
+        $category_id = isset($_POST['category_id']) ? intval($_POST['category_id']) : 0;
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 15;
+        $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
 
-    if ($category_id <= 0) {
-        echo json_encode(['articles' => [], 'total' => 0]);
+        if ($category_id <= 0) {
+            echo json_encode(['articles' => [], 'total' => 0]);
+            break;
+        }
+
+        $result = getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offset);
+        echo json_encode($result);
         break;
-    }
-
-    $result = getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offset);
-    echo json_encode($result);
-    break;
     case 'create':
         $title = $_POST['title'] ?? '';
         $excerpt = $_POST['excerpt'] ?? '';
@@ -302,18 +359,37 @@ switch ($action) {
 
     case 'createCategory':
         $name = $_POST['name'] ?? '';
-        echo json_encode(['success' => createCategory($conn, $name) > 0]);
+        $description = $_POST['description'] ?? '';
+        $categoryImgDir = '../../../public/images/categories/';
+        $category_img = uploadImage($_FILES['category_img'] ?? null, $categoryImgDir);
+        echo json_encode(['success' => createCategory($conn, $name, $category_img, $description) > 0]);
         break;
 
     case 'updateCategory':
         $id = $_POST['id'] ?? 0;
         $name = $_POST['name'] ?? '';
-        echo json_encode(['success' => updateCategory($conn, $id, $name) > 0]);
+        $description = $_POST['description'] ?? '';
+        $categoryImgDir = '../../../public/images/categories/';
+        $category_img = uploadImage($_FILES['category_img'] ?? null, $categoryImgDir);
+        // Lấy thông tin hiện tại nếu không upload file mới
+        $current = getDetailCategory($conn, $id);
+        if (!$category_img) {
+            $category_img = $current['category_img'];
+        }
+        $result = updateCategory($conn, $id, $name, $category_img, $description);
+        echo json_encode(['success' => $result > 0]);
+        
         break;
 
     case 'deleteCategory':
         $id = $_POST['id'] ?? 0;
         echo json_encode(['success' => deleteCategory($conn, $id) > 0]);
+        break;
+
+    case 'search':
+        $keyword = $_POST['keyword'] ?? '';
+        $results = searchArticles($conn, $keyword);
+        echo json_encode($results);
         break;
 
     default:

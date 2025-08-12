@@ -17,23 +17,7 @@ require 'auth_processing.php';
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        .article-title {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-
-        .article-excerpt {
-
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-    </style>
+    
 </head>
 
 <body>
@@ -72,6 +56,7 @@ require 'auth_processing.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/sidebar.js"></script>
+    <script src="../public/js/search.js"></script>
     
     <script>
         // Load trang khi document ready

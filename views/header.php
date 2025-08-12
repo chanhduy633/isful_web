@@ -16,10 +16,12 @@
 
 
             <div class="navbar-nav ms-auto">
-                <div class="search-login right">
+                <div class="search-icon-btn right">
                     <i class="fas fa-search"></i>
-
+                    <input type="text" class="search-input" placeholder="Tìm kiếm..." />
+                    <div class="search-results"></div>
                 </div>
+                
                 <?php if (isset($_SESSION['userid'])): ?>
                     <!-- User is logged in -->
                     <div class="nav-item dropdown">
@@ -52,11 +54,11 @@
                 <?php else: ?>
                     <!-- User is not logged in -->
                     <div class="auth-buttons">
-                        <button class="btn btn-auth" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <button class="btn btn-auth btn-in" data-bs-toggle="modal" data-bs-target="#loginModal">
                             Đăng nhập
                         </button>
                         <span>|</span>
-                        <button class="btn btn-auth" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        <button class="btn btn-auth btn-up" data-bs-toggle="modal" data-bs-target="#registerModal">
                             Đăng ký
                         </button>
                     </div>

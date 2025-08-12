@@ -63,6 +63,7 @@ require 'auth_processing.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/sidebar.js"></script>
+    <script src="../public/js/search.js"></script>
     <?php
     include '../views/footer.php';
     ?>
@@ -106,7 +107,7 @@ require 'auth_processing.php';
                                 </div>
                                 <div class="engagement-stats">
                                 <span class="text-white"><i class="fas fa-thumbs-up"></i> 3</span>
-                                <span class="text-white"><i class="fas fa-comment"></i> 0</span>
+                                <span class="text-white"><i class="fas fa-share"></i></span>
                                 <span class="text-white"><i class="fas fa-bookmark"></i></span>
                                 </div>
                             </div>
@@ -135,7 +136,7 @@ require 'auth_processing.php';
                                 </div>
                                 <div class="engagement-stats">
                                     <span><i class="fas fa-thumbs-up"></i> 4</span>
-                                    <span><i class="fas fa-comment"></i> 0</span>
+                                    <span><i class="fas fa-share"></i></span>
                                 </div>
                             </div>
                         </div>
@@ -245,7 +246,7 @@ require 'auth_processing.php';
                                                             </div>
                                                             <div class="engagement-stats">
                                                                 <span><i class="fas fa-thumbs-up"></i> 4</span>
-                                                                <span><i class="fas fa-comment"></i> 0</span>
+                                                                <span><i class="fas fa-share"></i></span>
                                                             </div>
                                                         </div>
                                                     </div>

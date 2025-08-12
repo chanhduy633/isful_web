@@ -7,7 +7,7 @@
                 <h5 class="modal-title" id="loginModalLabel">
                     <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-closed fa-solid fa-xmark" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="loginForm">
@@ -54,7 +54,7 @@
             <div class="modal-footer border-0">
                 <p class="text-center w-100 mb-0">
                     Chưa có tài khoản?
-                    <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký ngay</a>
+                    <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng ký </a>
                 </p>
             </div>
         </div>
@@ -69,7 +69,7 @@
                 <h5 class="modal-title" id="registerModalLabel">
                     <i class="fas fa-user-plus me-2"></i>Đăng ký tài khoản
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-closed fa-solid fa-xmark" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="registerForm">
@@ -96,7 +96,7 @@
             <div class="modal-footer border-0">
                 <p class="text-center w-100 mb-0">
                     Đã có tài khoản?
-                    <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập ngay</a>
+                    <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng nhập </a>
                 </p>
             </div>
         </div>

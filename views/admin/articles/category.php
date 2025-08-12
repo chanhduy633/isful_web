@@ -8,19 +8,38 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Reset các style có thể bị conflict từ Quill */
-        .table th, .table td {
+        .table th,
+        .table td {
             vertical-align: middle;
         }
-        
-        .btn-group-sm > .btn, .btn-sm {
+
+        .btn-group-sm>.btn,
+        .btn-sm {
             padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
             border-radius: 0.2rem;
         }
-        
+
         /* Đảm bảo modal hoạt động đúng */
         .modal {
             z-index: 1055;
+        }
+
+        /* Style cho ảnh danh mục */
+        .category-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+        }
+
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -38,11 +57,15 @@
                     <tr>
                         <th>ID</th>
                         <th>Tên danh mục</th>
+                        <th>Ảnh danh mục</th>
+                        <th>Mô tả danh mục</th>
                         <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="categories">
-                    <tr><td colspan="3" class="text-center">Đang tải...</td></tr>
+                    <tr>
+                        <td colspan="5" class="text-center">Đang tải...</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -55,17 +78,27 @@
                         <h5 class="modal-title">Thêm danh mục mới</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="category_name" class="form-label">Tên danh mục</label>
-                            <input type="text" id="category_name" class="form-control" placeholder="Nhập tên danh mục">
-                            <div class="invalid-feedback" id="create_error_msg"></div>
+                    <form id="createCategoryForm" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="category_name" class="form-label">Tên danh mục</label>
+                                <input type="text" id="category_name" name="name" class="form-control" placeholder="Nhập tên danh mục">
+                                <div class="invalid-feedback" id="create_error_msg"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="category_image" class="form-label">Ảnh danh mục</label>
+                                <input type="file" id="category_image" name="category_img" class="form-control" accept="image/*">
+                            </div>
+                            <div class="mb-3">
+                                <label for="category_description" class="form-label">Mô tả danh mục</label>
+                                <textarea id="category_description" name="description" class="form-control" rows="3" placeholder="Nhập mô tả cho danh mục (tùy chọn)"></textarea>
+                            </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button class="btn btn-success" id="createCategory">Thêm danh mục</button>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn btn-success" id="createCategory">Thêm danh mục</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -78,18 +111,32 @@
                         <h5 class="modal-title">Chỉnh sửa danh mục</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="edit_category_id">
-                        <div class="mb-3">
-                            <label for="edit_category_name" class="form-label">Tên danh mục</label>
-                            <input type="text" id="edit_category_name" class="form-control">
-                            <div class="invalid-feedback" id="edit_error_msg"></div>
+                    <form id="editCategoryForm" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <input type="hidden" id="edit_category_id" name="id">
+                            <div class="mb-3">
+                                <label for="edit_category_name" class="form-label">Tên danh mục</label>
+                                <input type="text" id="edit_category_name" name="name" class="form-control">
+                                <div class="invalid-feedback" id="edit_error_msg"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit_category_image" class="form-label">Ảnh danh mục</label>
+                                <input type="file" id="edit_category_image" name="category_img" class="form-control" accept="image/*">
+                                <div class="mt-2">
+                                    <img id="edit_image_preview" class="image-preview" style="display: none;">
+                                    <p class="text-muted mt-2">Để trống nếu không muốn thay đổi ảnh</p>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="edit_category_description" class="form-label">Mô tả danh mục</label>
+                                <textarea id="edit_category_description" name="description" class="form-control" rows="3" placeholder="Nhập mô tả cho danh mục (tùy chọn)"></textarea>
+                            </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button class="btn btn-primary" id="updateCategory">Lưu thay đổi</button>
-                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            <button type="button" class="btn btn-primary" id="updateCategory">Lưu thay đổi</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -104,10 +151,10 @@
         // Đảm bảo DOM ready trước khi thực thi
         $(document).ready(function() {
             console.log('Category page loaded successfully');
-            
+
             // Load categories khi trang được tải
             loadCategories();
-            
+
             // Event handlers
             setupEventHandlers();
         });
@@ -116,6 +163,8 @@
             // Nút thêm danh mục
             $('#btnAddCategory').off('click').on('click', function() {
                 $('#category_name').val('').removeClass('is-invalid');
+                $('#category_image').val('');
+                $('#category_description').val('');
                 $('#create_error_msg').text('');
                 $('#createCategoryModal').modal('show');
             });
@@ -128,6 +177,11 @@
             // Nút cập nhật danh mục
             $('#updateCategory').off('click').on('click', function() {
                 updateCategory();
+            });
+
+            // Preview ảnh khi upload - Edit modal
+            $('#edit_category_image').off('change').on('change', function() {
+                previewImage(this, '#edit_image_preview');
             });
 
             // Enter key support
@@ -144,26 +198,62 @@
             });
         }
 
+        function previewImage(input, previewSelector) {
+            const file = input.files[0];
+            const preview = $(previewSelector);
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.hide();
+            }
+        }
+
         function loadCategories() {
             console.log('Loading categories...');
-            
+
             $.ajax({
                 url: '/views/admin/controller/articles.php',
                 type: 'POST',
-                data: { action: 'getCategories' },
+                data: {
+                    action: 'getCategories'
+                },
                 dataType: 'json',
                 success: function(data) {
                     console.log('Categories loaded:', data);
-                    
+
                     if (Array.isArray(data) && data.length > 0) {
                         let html = '';
-                        data.forEach(cat => { 
+                        data.forEach(cat => {
+                            // Xử lý ảnh danh mục
+                            let imageHtml = '';
+                            if (cat.category_img && cat.category_img.trim() !== '') {
+                                imageHtml = `<img src="/public/images/categories/${escapeHtml(cat.category_img)}" class="category-image" alt="Category image">`;
+                            } else {
+                                imageHtml = '<span class="text-muted">Không có ảnh</span>';
+                            }
+                            // Xử lý mô tả danh mục
+                            let descriptionHtml = '';
+                            if (cat.category_description && cat.category_description.trim() !== '') {
+                                const shortDesc = cat.category_description.length > 50 ?
+                                    cat.category_description.substring(0, 50) + '...' :
+                                    cat.category_description;
+                                descriptionHtml = `<span title="${escapeHtml(cat.category_description)}">${escapeHtml(shortDesc)}</span>`;
+                            } else {
+                                descriptionHtml = '<span class="text-muted">Không có mô tả</span>';
+                            }
                             html += `<tr>
                                 <td>${cat.id}</td>
                                 <td>${escapeHtml(cat.name)}</td>
+                                <td>${imageHtml}</td>
+                                <td>${descriptionHtml}</td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <button class="btn btn-warning btn-sm" onclick="editCategory(${cat.id}, '${escapeHtml(cat.name)}')">
+                                        <button class="btn btn-warning btn-sm" onclick="editCategory(${cat.id}, '${escapeHtml(cat.name)}', '${escapeHtml(cat.category_img || '')}')">
                                             <i class="bi bi-pencil"></i> Sửa
                                         </button>
                                         <button class="btn btn-danger btn-sm" onclick="deleteCategory(${cat.id})">
@@ -175,47 +265,49 @@
                         });
                         $('#categories').html(html);
                     } else {
-                        $('#categories').html('<tr><td colspan="3" class="text-center text-muted">Chưa có danh mục nào</td></tr>');
+                        $('#categories').html('<tr><td colspan="5" class="text-center text-muted">Chưa có danh mục nào</td></tr>');
                     }
                 },
                 error: function(xhr, status, error) {
                     console.error('Error loading categories:', error);
-                    $('#categories').html('<tr><td colspan="3" class="text-center text-danger">Lỗi khi tải danh mục</td></tr>');
+                    $('#categories').html('<tr><td colspan="5" class="text-center text-danger">Lỗi khi tải danh mục</td></tr>');
                 }
             });
         }
 
         function createCategory() {
+            const formData = new FormData($('#createCategoryForm')[0]);
+            formData.append('action', 'createCategory');
+
             const name = $('#category_name').val().trim();
-            
+
             // Validation
             if (name === '') {
                 $('#category_name').addClass('is-invalid');
                 $('#create_error_msg').text('Vui lòng nhập tên danh mục!');
                 return;
             }
-            
+
             // Remove validation classes
             $('#category_name').removeClass('is-invalid');
             $('#create_error_msg').text('');
-            
+
             // Disable button to prevent double submission
             $('#createCategory').prop('disabled', true).text('Đang thêm...');
-            
+
             $.ajax({
                 url: '/views/admin/controller/articles.php',
                 type: 'POST',
-                data: {
-                    action: 'createCategory',
-                    name: name
-                },
+                data: formData,
+                processData: false,
+                contentType: false,
                 dataType: 'json',
                 success: function(response) {
                     if (response && response.success) {
                         $('#createCategoryModal').modal('hide');
-                        $('#category_name').val('');
+                        $('#createCategoryForm')[0].reset();
                         loadCategories();
-                        
+
                         Swal.fire({
                             title: 'Thành công!',
                             text: 'Danh mục đã được thêm',
@@ -245,45 +337,55 @@
             });
         }
 
-        function editCategory(id, name) {
+        function editCategory(id, name, categoryImg, categoryDescription) {
             $('#edit_category_id').val(id);
             $('#edit_category_name').val(name).removeClass('is-invalid');
+            $('#edit_category_image').val('');
+            $('#edit_category_description').val(categoryDescription || '');
             $('#edit_error_msg').text('');
+
+            // Hiển thị ảnh hiện tại nếu có
+            if (categoryImg && categoryImg.trim() !== '') {
+                $('#edit_image_preview').attr('src', '/public/images/categories/' + categoryImg).show();
+            } else {
+                $('#edit_image_preview').hide();
+            }
+
             $('#editCategoryModal').modal('show');
         }
 
         function updateCategory() {
-            const id = $('#edit_category_id').val();
+            const formData = new FormData($('#editCategoryForm')[0]);
+            formData.append('action', 'updateCategory');
+
             const name = $('#edit_category_name').val().trim();
-            
+
             // Validation
             if (name === '') {
                 $('#edit_category_name').addClass('is-invalid');
                 $('#edit_error_msg').text('Vui lòng nhập tên danh mục!');
                 return;
             }
-            
+
             // Remove validation classes
             $('#edit_category_name').removeClass('is-invalid');
             $('#edit_error_msg').text('');
-            
+
             // Disable button
             $('#updateCategory').prop('disabled', true).text('Đang cập nhật...');
-            
+
             $.ajax({
                 url: '/views/admin/controller/articles.php',
                 type: 'POST',
-                data: {
-                    action: 'updateCategory',
-                    id: id,
-                    name: name
-                },
+                data: formData,
+                processData: false,
+                contentType: false,
                 dataType: 'json',
                 success: function(response) {
                     if (response && response.success) {
                         $('#editCategoryModal').modal('hide');
                         loadCategories();
-                        
+
                         Swal.fire({
                             title: 'Thành công!',
                             text: 'Danh mục đã được cập nhật',
@@ -365,6 +467,7 @@
         }
 
         function escapeHtml(unsafe) {
+            if (!unsafe) return '';
             return unsafe
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
@@ -374,4 +477,5 @@
         }
     </script>
 </body>
+
 </html>

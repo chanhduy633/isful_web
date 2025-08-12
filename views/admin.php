@@ -36,7 +36,7 @@ $get = isset($_GET["page"]) ? $_GET["page"] : "";
         </button>
         <div class="navbar-nav">
             <div class="nav-item text-nowrap">
-                <a class="nav-link px-3" href="./logout.php">Đăng xuất</a>
+                <a style="color:white!important;" class="nav-link px-3" href="./logout.php">Đăng xuất</a>
             </div>
         </div>
     </header>

@@ -1,6 +1,14 @@
 /* auth.css - Styling cho authentication components */
 
 /* User Avatar & Header */
+:root {
+  --primary-color: #000;
+  --secondary-color: #f8f9fa;
+  --accent-color: #dc3545;
+  --dark-blue: #012169;
+  --mint-green: #00af50;
+}
+
 .user-avatar {
   width: 36px;
   height: 36px;
@@ -39,7 +47,7 @@
 }
 
 .dropdown-toggle::after {
-  content: none!important;
+  content: none !important;
 }
 
 .auth-buttons {
@@ -56,10 +64,21 @@
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--dark-blue);
   color: white;
   border-radius: 15px 15px 0 0;
   padding: 20px 30px;
+}
+.btn-closed {
+  background: transparent;
+  border: none;
+  color: white !important;
+  opacity: 0.8 !important;
+  font-size: 1.6rem;
+}
+.btn-closed :hover {
+  opacity: 1 !important;
+  transform: scale(1.1);
 }
 
 .modal-title {
@@ -68,7 +87,8 @@
 }
 
 .modal-body {
-  padding: 30px;
+  margin: 0 auto;
+  width: 80%;
 }
 
 .modal-footer {
@@ -113,11 +133,19 @@
   font-weight: 700 !important;
   font-size: 14px;
   transition: all 0.3s ease;
-  color: #059669 !important;
   padding: 0 !important;
 }
+.btn-in {
+  color: var(--dark-blue) !important;
+}
+.btn-in:hover {
+  color: var(--mint-green) !important;
+}
 
-.btn-auth:hover {
+.btn-up {
+  color: var(--mint-green) !important;
+}
+.btn-up:hover {
   color: var(--dark-blue) !important;
 }
 
