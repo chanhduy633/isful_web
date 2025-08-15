@@ -91,7 +91,7 @@ function loadSidebarContent() {
     url: "/views/admin/controller/articles.php",
     method: "POST",
     data: {
-      action: "getMainArticles",
+      action: "getFeaturedArticles",
       limit: 5,
     },
     dataType: "json",

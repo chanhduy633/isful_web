@@ -94,12 +94,13 @@
                         <th>Hình ảnh</th>
                         <th>Ngày đăng</th>
                         <th>Danh mục</th>
+                        <th>Nổi bật</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody id="articleList">
                     <tr>
-                        <td colspan="9">Loading...</td>
+                        <td colspan="10">Loading...</td>
                     </tr>
                 </tbody>
             </table>
@@ -365,7 +366,6 @@
                         stripHtml(a.content);
 
                     let imagePath = `/public/images/articles/${a.image_url}`;
-
                     rows += `<tr>
                         <td>${a.id}</td>
                         <td>${title}</td>
@@ -380,6 +380,14 @@
                         <td><img src="${imagePath}" style="width: 60px; height: 60px; object-fit: cover;"></td>
                         <td>${formatDate(a.publish_date)}</td>
                         <td><span class="badge bg-primary">${a.category_name}</span></td>
+                        <td>
+                            <input 
+                            type="checkbox" 
+                            class="form-check-input toggle-featured" 
+                            data-id="${a.id}" 
+                            ${Number(a.is_featured) === 1 ? 'checked' : ''}
+                            >
+                        </td>
                         <td>
                             <div class="btn-group-vertical">
                                 <button class="btn btn-warning btn-sm mb-1" onclick="editArticle(${a.id})">Sửa</button>
@@ -476,6 +484,103 @@
                 }
             });
         }
+        // Thay thế JavaScript xử lý toggle featured với version có debug
+
+        $(document).on('change', '.toggle-featured', function() {
+            const checkbox = $(this);
+            const articleId = checkbox.data('id');
+            const isFeatured = this.checked ? 1 : 0;
+
+            console.log('Toggle Featured - Article ID:', articleId, 'New Status:', isFeatured);
+
+            // Kiểm tra articleId có hợp lệ không
+            if (!articleId || articleId <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'ID bài viết không hợp lệ: ' + articleId
+                });
+                checkbox.prop('checked', !isFeatured);
+                return;
+            }
+
+            // Disable checkbox trong khi đang xử lý
+            checkbox.prop('disabled', true);
+
+            $.ajax({
+                url: '/views/admin/controller/articles.php',
+                type: 'POST',
+                data: {
+                    action: 'toggleFeatured',
+                    id: articleId,
+                    is_featured: isFeatured
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Server Response:', response);
+
+                    if (response.success) {
+                        // Hiển thị thông báo thành công
+                        console.log('Cập nhật trạng thái nổi bật thành công');
+
+                        // Cập nhật lại trạng thái checkbox theo response từ server
+                        checkbox.prop('checked', response.is_featured == 1);
+
+                        // Hiển thị toast thành công (tuỳ chọn)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công!',
+                            text: response.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        // Hiển thị thông báo lỗi chi tiết
+                        console.error('Toggle Featured Error:', response);
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            html: `
+                        <p>${response.message}</p>
+                        ${response.current_value !== undefined ? `<small>Giá trị hiện tại: ${response.current_value}</small><br>` : ''}
+                        ${response.requested_value !== undefined ? `<small>Giá trị yêu cầu: ${response.requested_value}</small>` : ''}
+                    `,
+                            timer: 3000
+                        });
+
+                        // Khôi phục trạng thái checkbox về trạng thái trước đó
+                        checkbox.prop('checked', !isFeatured);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
+
+                    // Hiển thị thông báo lỗi
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi kết nối!',
+                        html: `
+                    <p>Có lỗi xảy ra khi kết nối đến máy chủ!</p>
+                    <small>Status: ${status}</small><br>
+                    <small>Error: ${error}</small>
+                `,
+                        timer: 3000
+                    });
+
+                    // Khôi phục trạng thái checkbox về trạng thái trước đó
+                    checkbox.prop('checked', !isFeatured);
+                },
+                complete: function() {
+                    // Bật lại checkbox sau khi xử lý xong
+                    checkbox.prop('disabled', false);
+                }
+            });
+        });
     </script>
 </body>
 

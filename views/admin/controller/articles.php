@@ -253,6 +253,35 @@ function searchArticles($conn, $keyword)
 
     return $articles;
 }
+
+// Hàm để cập nhật trạng thái nổi bật
+function toggleFeatured($conn, $id, $is_featured)
+{
+    $stmt = $conn->prepare("UPDATE articles SET is_featured = ? WHERE id = ?");
+    $stmt->bind_param("ii", $is_featured, $id);
+    $stmt->execute();
+    return $stmt->affected_rows;
+}
+function getFeaturedArticles($conn, $limit = 5)
+{
+    $sql = "SELECT articles.*, article_categories.name AS category_name 
+            FROM articles 
+            LEFT JOIN article_categories ON articles.category_id = article_categories.id 
+            WHERE articles.is_featured = 1 
+            ORDER BY publish_date DESC 
+            LIMIT ?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $limit);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $articles = [];
+    while ($row = $result->fetch_assoc()) {
+        $articles[] = $row;
+    }
+    return $articles;
+}
 // Xử lý yêu cầu AJAX
 $action = isset($_POST['action']) ? $_POST['action'] : '';
 
@@ -283,6 +312,11 @@ switch ($action) {
         $result = getArticlesByCategoryWithPagination($conn, $category_id, $limit, $offset);
         echo json_encode($result);
         break;
+    case 'getFeaturedArticles':
+        $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 5;
+        echo json_encode(getFeaturedArticles($conn, $limit));
+        break;
+
     case 'create':
         $title = $_POST['title'] ?? '';
         $excerpt = $_POST['excerpt'] ?? '';
@@ -378,7 +412,7 @@ switch ($action) {
         }
         $result = updateCategory($conn, $id, $name, $category_img, $description);
         echo json_encode(['success' => $result > 0]);
-        
+
         break;
 
     case 'deleteCategory':
@@ -391,7 +425,86 @@ switch ($action) {
         $results = searchArticles($conn, $keyword);
         echo json_encode($results);
         break;
+    case 'toggleFeatured':
+        $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+        $is_featured = isset($_POST['is_featured']) ? intval($_POST['is_featured']) : 0;
 
+        // Debug: Log thông tin nhận được
+        error_log("Toggle Featured - ID: $id, is_featured: $is_featured");
+
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'ID không hợp lệ: ' . $id]);
+            break;
+        }
+
+        // Đảm bảo is_featured chỉ có giá trị 0 hoặc 1
+        $is_featured = $is_featured ? 1 : 0;
+
+        // Kiểm tra xem bài viết có tồn tại không
+        $checkStmt = $conn->prepare("SELECT id FROM articles WHERE id = ?");
+        $checkStmt->bind_param("i", $id);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
+
+        if ($checkResult->num_rows == 0) {
+            echo json_encode(['success' => false, 'message' => 'Bài viết không tồn tại với ID: ' . $id]);
+            break;
+        }
+
+        // Thực hiện cập nhật
+        $updateStmt = $conn->prepare("UPDATE articles SET is_featured = ? WHERE id = ?");
+        if (!$updateStmt) {
+            echo json_encode(['success' => false, 'message' => 'Lỗi prepare statement: ' . $conn->error]);
+            break;
+        }
+
+        $updateStmt->bind_param("ii", $is_featured, $id);
+        $executeResult = $updateStmt->execute();
+
+        if (!$executeResult) {
+            echo json_encode(['success' => false, 'message' => 'Lỗi execute: ' . $updateStmt->error]);
+            break;
+        }
+
+        $affected_rows = $updateStmt->affected_rows;
+
+        // Debug: Log kết quả
+        error_log("Toggle Featured Result - Affected rows: $affected_rows");
+
+        if ($affected_rows > 0) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Cập nhật trạng thái nổi bật thành công',
+                'is_featured' => $is_featured,
+                'affected_rows' => $affected_rows
+            ]);
+        } else {
+            // Kiểm tra xem giá trị đã giống rồi không
+            $currentStmt = $conn->prepare("SELECT is_featured FROM articles WHERE id = ?");
+            $currentStmt->bind_param("i", $id);
+            $currentStmt->execute();
+            $currentResult = $currentStmt->get_result();
+            $currentData = $currentResult->fetch_assoc();
+
+            if ($currentData && $currentData['is_featured'] == $is_featured) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Trạng thái đã được cập nhật trước đó',
+                    'is_featured' => $is_featured,
+                    'note' => 'Giá trị không thay đổi'
+                ]);
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Không thể cập nhật trạng thái nổi bật. Affected rows: ' . $affected_rows,
+                    'current_value' => $currentData ? $currentData['is_featured'] : 'unknown',
+                    'requested_value' => $is_featured
+                ]);
+            }
+        }
+
+        $updateStmt->close();
+        break;
     default:
         echo json_encode(['error' => 'Invalid action']);
         break;
