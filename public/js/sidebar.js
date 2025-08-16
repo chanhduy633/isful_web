@@ -86,7 +86,7 @@ function renderTopAuthors(authors) {
   });
 }
 //Load sidebar content
-function loadSidebarContent() {
+function loadSidebarPicks() {
   $.ajax({
     url: "/views/admin/controller/articles.php",
     method: "POST",
@@ -96,32 +96,50 @@ function loadSidebarContent() {
     },
     dataType: "json",
     success: function (response) {
-      console.log("👉 Dữ liệu nhận được:", response);
-
       // Kiểm tra nếu response là mảng và có dữ liệu
       if (Array.isArray(response) && response.length > 0) {
         // ✅ 1. Render Editor's Picks (dùng toàn bộ bài viết)
-        console.log("Render Editor Picks");
         renderEditorPicks(response);
 
-        // ✅ 2. Render Bài hot trong tuần (dùng cùng dữ liệu)
-        console.log("Render Hot Articles");
-        renderHotArticles(response);
+        
+      } else {
+        console.warn("Dữ liệu từ API không hợp lệ hoặc rỗng");
+      }
+    },
+  });
+}
+function loadSidebarHot() {
+  $.ajax({
+    url: "/controller/like_controller.php",
+    method: "POST",
+    data: {
+      action: "getMostLiked",
+      limit: 5,
+    },
+    dataType: "json",
+    success: function (response) {
+      if (response.success && Array.isArray(response.data) && response.data.length > 0) {
+        const articles = response.data;
+
+        // Render bài viết hot
+        renderHotArticles(articles);
 
         // ✅ 3. Tạo danh sách tác giả từ author_name trong bài viết
         const authorsMap = {};
-        response.forEach((article) => {
+        articles.forEach((article) => {
           const name = article.author_name;
+          const avatar = article.author_avatar;
+
           if (name && !authorsMap[name]) {
             authorsMap[name] = {
               name: name,
-              title: "Content Writer | Insightful", // Có thể lấy từ DB sau
-              avatar_url: article.author_avatar, // tạm thời không có ảnh
+              title: "Content Writer | Insightful", // Có thể mở rộng sau
+              avatar_url: article.author_avatar, 
             };
           }
         });
         const topAuthors = Object.values(authorsMap);
-        console.log("Render Top Authors");
+        
         renderTopAuthors(topAuthors);
       } else {
         console.warn("Dữ liệu từ API không hợp lệ hoặc rỗng");
@@ -131,5 +149,7 @@ function loadSidebarContent() {
 }
 // Load trang khi document ready
 $(document).ready(function () {
-  loadSidebarContent();
+  loadSidebarPicks();
+  loadSidebarHot();
+
 });

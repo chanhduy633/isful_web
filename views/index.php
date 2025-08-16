@@ -106,7 +106,7 @@ require 'auth_processing.php';
                                 </div>
                                 </div>
                                 <div class="engagement-stats">
-                                <span class="text-white"><i class="fas fa-thumbs-up"></i> 3</span>
+                                <span class="text-white"><i class="fas fa-thumbs-up"></i>${article.likes}</span>
                                 <span class="text-white"><i class="fas fa-share"></i></span>
                                 <span class="text-white"><i class="fas fa-bookmark"></i></span>
                                 </div>
@@ -135,7 +135,7 @@ require 'auth_processing.php';
                                     </div>
                                 </div>
                                 <div class="engagement-stats">
-                                    <span><i class="fas fa-thumbs-up"></i> 4</span>
+                                    <span><i class="fas fa-thumbs-up"></i>${article.likes}</span>
                                     <span><i class="fas fa-share"></i></span>
                                 </div>
                             </div>
@@ -245,7 +245,7 @@ require 'auth_processing.php';
                                                                 </div>
                                                             </div>
                                                             <div class="engagement-stats">
-                                                                <span><i class="fas fa-thumbs-up"></i> 4</span>
+                                                                <span><i class="fas fa-thumbs-up"></i>${articles[0].likes}</span>
                                                                 <span><i class="fas fa-share"></i></span>
                                                             </div>
                                                         </div>

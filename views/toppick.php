@@ -17,7 +17,7 @@ require 'auth_processing.php';
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
 </head>
 
 <body>
@@ -25,7 +25,7 @@ require 'auth_processing.php';
     include '../views/header.php';
     include '../views/login.php';
     ?>
-    
+
     <div id="home-page">
         <div class="container-custom mw-993 mt-4">
             <div class="row">
@@ -33,7 +33,7 @@ require 'auth_processing.php';
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="section-title">Top Pick</h2>
                     </div>
-                    
+
                     <!-- Main Content Section -->
                     <div id="main-content" class="row">
                         <div class="loading">
@@ -43,27 +43,27 @@ require 'auth_processing.php';
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Sidebar -->
                 <?php include '../views/sidebar.php'; ?>
             </div>
         </div>
     </div>
-    
+
     <?php include '../views/footer.php'; ?>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/sidebar.js"></script>
     <script src="../public/js/search.js"></script>
-    
+
     <script>
         // Load trang khi document ready
         $(document).ready(function() {
             loadMainArticles();
         });
-        
+
         // Hàm format ngày tháng
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -74,7 +74,7 @@ require 'auth_processing.php';
             };
             return date.toLocaleDateString('vi-VN', options);
         }
-        
+
         // Hàm tạo HTML cho mỗi bài viết
         function createArticleHTML(article) {
             return `
@@ -94,8 +94,9 @@ require 'auth_processing.php';
                             <div class="article-meta">
                                 <div class="engagement-stats">
                                     <span><i class="fas fa-thumbs-up"></i> ${article.likes || 4}</span>
-                                    <span><i class="fas fa-comment"></i> ${article.comments || 0}</span>
                                     <span><i class="fas fa-bookmark"></i></span>
+                                    <span><i class="fas fa-share"></i></span>
+
                                 </div>
                             </div>
                         </div>
@@ -103,7 +104,7 @@ require 'auth_processing.php';
                 </div>
             `;
         }
-        
+
         // Load bài viết
         function loadMainArticles() {
             $.ajax({
@@ -131,4 +132,5 @@ require 'auth_processing.php';
         }
     </script>
 </body>
+
 </html>

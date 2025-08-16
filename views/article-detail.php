@@ -340,22 +340,19 @@ $conn->close();
                         </div>
                         <!-- Engagement actions -->
                         <div class="engagement-actions">
-                            <a href="#" class="engagement-button" id="like-btn">
+                            <button class="engagement-button" id="like-btn" data-article-id="<?php echo $article_id; ?>">
                                 <i class="fas fa-thumbs-up"></i>
-                                Thích (3)
-                            </a>
-                            <a href="#" class="engagement-button" id="comment-btn">
-                                <i class="fas fa-comment"></i>
-                                Bình luận (0)
-                            </a>
-                            <a href="#" class="engagement-button" id="bookmark-btn">
+                                <span>Thích (<span id="likes-count">0</span>)</span>
+                            </button>
+
+                            <button class="engagement-button" id="bookmark-btn" data-article-id="<?php echo $article_id; ?>">
                                 <i class="fas fa-bookmark"></i>
-                                Lưu
-                            </a>
-                            <a href="article-detail.php?id=${article.id}" class="engagement-button" id="share-btn">
+                                <span>Lưu</span>
+                            </button>
+                            <button class="engagement-button" id="share-btn">
                                 <i class="fas fa-share"></i>
-                                Chia sẻ
-                            </a>
+                                <span>Chia sẻ</span>
+                            </button>
                         </div>
                     </div>
 
@@ -382,32 +379,251 @@ $conn->close();
     <script src="../public/js/sidebar.js"></script>
     <script src="../public/js/search.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // Xử lý các action engagement
-            $('.engagement-button').click(function(e) {
-                e.preventDefault();
-                $(this).toggleClass('active');
-            });
+     <script>
+        class LikeSystem {
+            constructor(articleId) {
+                this.articleId = articleId;
+                this.init();
+            }
 
-            // Xử lý chia sẻ
-            $('#share-btn').click(function(e) {
-                e.preventDefault();
+            init() {
+                this.bindEvents();
+                this.loadLikeStatus();
+            }
+
+            bindEvents() {
+                // Main like button
+                $('#like-btn').on('click', (e) => {
+                    e.preventDefault();
+                    this.toggleLike();
+                });
+
+                // Sticky like button
+                $('#sticky-like-btn').on('click', (e) => {
+                    e.preventDefault();
+                    this.toggleLike();
+                });
+
+                // Bookmark button
+                $('#bookmark-btn, #sticky-bookmark-btn').on('click', (e) => {
+                    e.preventDefault();
+                    this.toggleBookmark();
+                });
+
+                // Share button
+                $('#share-btn, #sticky-share-btn').on('click', (e) => {
+                    e.preventDefault();
+                    this.shareArticle();
+                });
+            }
+
+            async toggleLike() {
+                if ($('#like-btn').hasClass('loading')) return;
+
+                this.setLoading(true);
+
+                try {
+                    const response = await fetch('/controller/like_controller.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=toggle&article_id=${this.articleId}`
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.updateLikeUI(data.likes_count, data.user_liked);
+                        this.showToast(data.message, 'success');
+                    } else {
+                        if (data.require_login) {
+                            // Yêu cầu đăng nhập - hiển thị prompt
+                            this.showLoginPrompt();
+                        } else {
+                            this.showToast(data.message || 'Có lỗi xảy ra', 'error');
+                        }
+                    }
+                } catch (error) {
+                    this.showToast('Không thể kết nối đến server', 'error');
+                }
+
+                this.setLoading(false);
+            }
+
+            async loadLikeStatus() {
+                try {
+                    const response = await fetch('/controller/like_controller.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=getLikeStatus&article_id=${this.articleId}`
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.updateLikeUI(result.data.likes_count, result.data.user_liked);
+                    }
+                } catch (error) {
+                    console.error('Load like status error:', error);
+                }
+            }
+
+            updateLikeUI(likesCount, userLiked) {
+                // Update like count
+                $('#likes-count').text(likesCount);
+                $('#sticky-likes-count').text(likesCount);
+
+                // Update button states
+                const likeButtons = $('#like-btn, #sticky-like-btn');
+                
+                if (userLiked) {
+                    likeButtons.addClass('liked');
+                    $('#like-btn').find('span').html(`Đã thích (${likesCount})`);
+                } else {
+                    likeButtons.removeClass('liked');
+                    $('#like-btn').find('span').html(`Thích (${likesCount})`);
+                }
+            }
+
+            showLoginPrompt() {
+    
+    // Hiển thị thông báo trong modal
+    const messageDiv = $('#loginMessage');
+    messageDiv.html('<div class="alert alert-info mb-0">Vui lòng đăng nhập để sử dụng tính năng này.</div>');
+
+    // Mở modal đăng nhập Bootstrap
+    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+    loginModal.show();
+}
+
+
+openLoginModal() {
+    // Gọi lại showLoginPrompt để đảm bảo thông báo được hiển thị
+    this.showLoginPrompt();
+}
+
+            toggleBookmark() {
+                const bookmarkBtns = $('#bookmark-btn, #sticky-bookmark-btn');
+                
+                // Kiểm tra đăng nhập trước
+                this.checkLoginForAction('bookmark').then((canProceed) => {
+                    if (!canProceed) return;
+                    
+                    const isBookmarked = bookmarkBtns.hasClass('bookmarked');
+                    
+                    if (isBookmarked) {
+                        bookmarkBtns.removeClass('bookmarked');
+                        $('#bookmark-btn').find('span').text('Lưu');
+                        this.showToast('Đã bỏ lưu bài viết', 'success');
+                    } else {
+                        bookmarkBtns.addClass('bookmarked');
+                        $('#bookmark-btn').find('span').text('Đã lưu');
+                        this.showToast('Đã lưu bài viết', 'success');
+                    }
+                });
+            }
+
+            async checkLoginForAction(actionType) {
+                try {
+                    const response = await fetch('/controller/like_controller.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=getLikeStatus&article_id=${this.articleId}`
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success && !result.data.is_logged_in) {
+                        this.showToast(`Vui lòng đăng nhập để ${actionType === 'bookmark' ? 'lưu bài viết' : 'sử dụng tính năng này'}`, 'error');
+                        this.showLoginPrompt();
+                        return false;
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('Check login error:', error);
+                    return true; // Cho phép tiếp tục nếu có lỗi
+                }
+            }
+
+            shareArticle() {
+                const title = <?php echo json_encode($article['title']); ?>;
+                const excerpt = <?php echo json_encode($article['excerpt']); ?>;
+                const url = window.location.href;
+
                 if (navigator.share) {
                     navigator.share({
-                        title: '<?php echo addslashes($article['title']); ?>',
-                        text: '<?php echo addslashes($article['excerpt']); ?>',
-                        url: window.location.href
+                        title: title,
+                        text: excerpt,
+                        url: url
+                    }).then(() => {
+                        this.showToast('Đã chia sẻ thành công', 'success');
+                    }).catch((error) => {
+                        console.log('Share error:', error);
                     });
                 } else {
                     // Fallback - copy to clipboard
-                    navigator.clipboard.writeText(window.location.href).then(function() {
-                        alert('Link đã được sao chép vào clipboard!');
+                    navigator.clipboard.writeText(url).then(() => {
+                        this.showToast('Link đã được sao chép vào clipboard!', 'success');
+                    }).catch(() => {
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = url;
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        this.showToast('Link đã được sao chép!', 'success');
                     });
                 }
-            });
+            }
+
+            setLoading(loading) {
+                const buttons = $('#like-btn, #sticky-like-btn');
+                if (loading) {
+                    buttons.addClass('loading').prop('disabled', true);
+                } else {
+                    buttons.removeClass('loading').prop('disabled', false);
+                }
+            }
+
+            showToast(message, type = 'success') {
+                const toastId = 'toast-' + Date.now();
+                const toast = $(`
+                    <div class="toast ${type}" id="${toastId}">
+                        <div class="toast-message">${message}</div>
+                    </div>
+                `);
+
+                $('#toast-container').append(toast);
+
+                // Trigger animation
+                setTimeout(() => {
+                    toast.addClass('show');
+                }, 100);
+
+                // Auto remove
+                setTimeout(() => {
+                    toast.removeClass('show');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize when document is ready
+        $(document).ready(function() {
+            const articleId = <?php echo $article_id; ?>;
+            window.likeSystem = new LikeSystem(articleId);
         });
     </script>
+</body>
 </body>
 
 </html>
