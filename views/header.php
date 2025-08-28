@@ -37,7 +37,7 @@
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
+                            <li><a class="dropdown-item" href="/views/user.php"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
                             <?php if ($_SESSION['role'] === 'admin'): ?>
                                 <li>

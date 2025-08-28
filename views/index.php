@@ -12,6 +12,7 @@ require 'auth_processing.php';
     <title>Insigtful</title>
     <link rel="stylesheet" href="../public/css/style.css">
     <link rel="stylesheet" href="../public/css/auth.css">
+    <link rel="stylesheet" href="../public/css/interactive.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
     <link rel="icon" type="image/png" href="/public/images/logo.png">
@@ -57,19 +58,20 @@ require 'auth_processing.php';
             </div>
         </div>
     </div>
-   
+
     <!-- Footer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/sidebar.js"></script>
     <script src="../public/js/search.js"></script>
+    <script src="../public/js/interactive-system.js"></script>
+    <script src="../public/js/interactive-helpers.js"></script>
     <?php
     include '../views/footer.php';
     ?>
 
     <script>
-        
         // Load trang khi document ready
         $(document).ready(function() {
             loadMainArticles();
@@ -91,76 +93,95 @@ require 'auth_processing.php';
 
             return `
                 <div class="col-12 col-md-8 mt-24">
-                    <div class="main-article">
-                        <img class = "w-100" src="/public/images/articles/${article.image_url}" alt="${article.title}" >
-                        <a href = "article-detail.php?id=${article.id}" class="overlay-bg"></a>
-                        <div class="thumbnail-describe">
-                            <a href = "article-detail.php?id=${article.id}"><h2 class="line-clamp-2">${article.title}</h2></a> 
-                            <h4 class="line-clamp-2">${article.excerpt}</h4>
-                            <div class="article-meta">
-                                <div class="author-info">
-                                <img src="/public/images/authors/${article.author_avatar}" alt="Author" class="author-avatar">
-                                <div>
-                                    <div style="color: white; font-weight: 500;">${article.author_name}</div>
-                                    <div style="color: #ccc;">${formatDate(article.publish_date)}</div>
-                                </div>
-                                </div>
-                                <div class="engagement-stats">
-                                <span class="text-white"><i class="fas fa-thumbs-up"></i>${article.likes}</span>
-                                <span class="text-white"><i class="fas fa-share"></i></span>
-                                <span class="text-white"><i class="fas fa-bookmark"></i></span>
-                                </div>
+            <div class="main-article">
+                <img class="w-100" src="/public/images/articles/${escapeHtml(article.image_url)}" alt="${escapeHtml(article.title)}">
+                <a href="article-detail.php?id=${article.id}" class="overlay-bg"></a>
+                <div class="thumbnail-describe">
+                    <a href="article-detail.php?id=${article.id}">
+                        <h2 class="line-clamp-2">${escapeHtml(article.title)}</h2>
+                    </a> 
+                    <h4 class="line-clamp-2">${escapeHtml(article.excerpt)}</h4>
+                    <div class="article-meta">
+                        <div class="author-info">
+                            <img src="/public/images/authors/${escapeHtml(article.author_avatar)}" alt="Author" class="author-avatar">
+                            <div>
+                                <div style="color: white; font-weight: 500;">${escapeHtml(article.author_name)}</div>
+                                <div style="color: #ccc;">${formatDate(article.publish_date)}</div>
                             </div>
                         </div>
+                        ${generateEngagementStats(article, { theme: 'dark' })}
                     </div>
-                    </div>
+                </div>
+            </div>
+        </div>
             `;
         }
 
         // Hàm tạo HTML cho article card
-        function createArticleCardHTML(article) {
+        function createArticleCardHTML(article, options = {}) {
+            const {
+                showExcerpt = true,
+                    showAuthor = true,
+                    showEngagement = true,
+                    colClass = 'col-6 col-md-4'
+            } = options;
+
             return `
-                <div class="col-6 col-md-4 mt-24">
-                    <div class="article-card">
-                        <a href = "article-detail.php?id=${article.id}"><img src="/public/images/articles/${article.image_url}" alt="Article" class="article-image"></a>
-                        <div class="article-content">
-                            <a href = "article-detail.php?id=${article.id}"><h3 class="article-title line-clamp-2">${article.title}</h3></a>
-                            <p class="article-excerpt line-clamp-2">${article.excerpt}</p>
+            <div class="${colClass} mt-24">
+                <div class="article-card">
+                    <a href="article-detail.php?id=${article.id}">
+                        <img src="/public/images/articles/${escapeHtml(article.image_url)}" alt="Article" class="article-image">
+                    </a>
+                    <div class="article-content">
+                        <a href="article-detail.php?id=${article.id}">
+                            <h3 class="article-title line-clamp-2">${escapeHtml(article.title)}</h3>
+                        </a>
+                        ${showExcerpt ? `<p class="article-excerpt line-clamp-2">${escapeHtml(article.excerpt)}</p>` : ''}
+                        ${showAuthor ? `
                             <div class="article-meta">
                                 <div class="author-info">
-                                    <img src="/public/images/authors/${article.author_avatar}" alt="Author" class="author-avatar">
+                                    <img src="/public/images/authors/${escapeHtml(article.author_avatar)}" alt="Author" class="author-avatar">
                                     <div>
-                                        <div style="font-weight: 500;">${article.author_name}</div>
-                                        <div>${formatDate(article.publish_date)}</div>
+                                        <div style="font-weight: 500;">${escapeHtml(article.author_name)}</div>
+                                        <div style="font-size: 10px;">${formatDate(article.publish_date)}</div>
                                     </div>
                                 </div>
-                                <div class="engagement-stats">
-                                    <span><i class="fas fa-thumbs-up"></i>${article.likes}</span>
-                                    <span><i class="fas fa-share"></i></span>
-                                </div>
+                                ${showEngagement ? generateEngagementStats(article) : ''}
                             </div>
-                        </div>
+                        ` : ''}
+                        ${!showAuthor && showEngagement ? generateEngagementStats(article) : ''}
                     </div>
                 </div>
-            `;
+            </div>
+        `;
         }
 
+
         // Hàm tạo HTML cho small article
-        function createSmallArticleHTML(article) {
+        function createSmallArticleHTML(article, options = {}) {
+            const {
+                showEngagement = true
+            } = options;
+
             return `
-                <div class="small-article">
-                    <a href="article-detail.php?id=${article.id}"><img src="/public/images/articles/${article.image_url}" alt="Article" class="small-article-image"></a>
-                    <a href="article-detail.php?id=${article.id}" class="small-article-content">
-                        <h4 class="small-article-title line-clamp-4">${article.title}</h4>
-                    </a>
-                </div>
-            `;
+        <div class="small-article">
+            <a href="article-detail.php?id=${article.id}">
+                <img src="/public/images/articles/${escapeHtml(article.image_url)}" alt="Article" class="small-article-image">
+            </a>
+            <div>
+                <a class="small-article-content" href="article-detail.php?id=${article.id}">
+                    <h4 class="small-article-title line-clamp-4">${escapeHtml(article.title)}</h4>
+                </a>
+                ${showEngagement ? generateEngagementStats(article, { size: 'small' }) : ''}
+            </div>
+        </div>
+    `;
         }
 
         // Load main articles (5 bài viết mới nhất)
         function loadMainArticles() {
             $.ajax({
-                url: '/views/admin/controller/articles.php', // Thay đổi đường dẫn này
+                url: '/views/admin/controller/articles.php',
                 method: 'POST',
                 data: {
                     action: 'getMainArticles',
@@ -191,7 +212,7 @@ require 'auth_processing.php';
         // Load categories và articles theo category
         function loadCategorySections() {
             $.ajax({
-                url: '/views/admin/controller/articles.php', // Thay đổi đường dẫn này
+                url: '/views/admin/controller/articles.php',
                 method: 'POST',
                 data: {
                     action: 'getCategories'
@@ -205,7 +226,7 @@ require 'auth_processing.php';
                         categories.forEach(function(category) {
                             // Load articles cho mỗi category
                             $.ajax({
-                                url: '/views/admin/controller/articles.php', // Thay đổi đường dẫn này
+                                url: '/views/admin/controller/articles.php',
                                 method: 'POST',
                                 data: {
                                     action: 'getArticlesByCategory',
@@ -216,53 +237,35 @@ require 'auth_processing.php';
                                 success: function(articles) {
                                     if (articles && articles.length > 0) {
                                         let sectionHTML = `
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="section-header d-flex justify-content-between align-items-center">
-                                                        <h2 class="section-title">${category.name}</h2>
-                                                        <a href="category.php?id=${category.id}" class="see-all" style = "font-weight: 700;">
-                                                            Tất cả <i class="fas fa-arrow-right"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12 col-md-6">
-                                        `;
-
-                                        // Main article của category (bài đầu tiên)
-                                        if (articles[0]) {
-                                            sectionHTML += `
-                                                <div class="article-card">
-                                                    <a href = "article-detail.php?id=${articles[0].id}"><img src="/public/images/articles/${articles[0].image_url}" alt="Article" class="article-image"></a>
-                                                    <div class="article-content">
-                                                        <a href = "article-detail.php?id=${articles[0].id}"><h3 class="article-title line-clamp-2">${articles[0].title}</h3></a>
-                                                        <p class="article-excerpt line-clamp-2">${articles[0].excerpt}</p>
-                                                        <div class="article-meta">
-                                                            <div class="author-info">
-                                                                <img src="/public/images/authors/${articles[0].author_avatar}" alt="Author" class="author-avatar">
-                                                                <div>
-                                                                    <div style="font-weight: 500;">${articles[0].author_name}</div>
-                                                                    <div>${formatDate(articles[0].publish_date)}</div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="engagement-stats">
-                                                                <span><i class="fas fa-thumbs-up"></i>${articles[0].likes}</span>
-                                                                <span><i class="fas fa-share"></i></span>
-                                                            </div>
+                                            <div class="category-section mb-5">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                                                            <h2 class="section-title">${escapeHtml(category.name)}</h2>
+                                                            <a href="category.php?id=${category.id}" class="see-all" style="font-weight: 700;">
+                                                                Tất cả <i class="fas fa-arrow-right"></i>
+                                                            </a>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            `;
-                                        }
-
-                                        sectionHTML += `
-                                                </div>
-                                                <div class="col-12 col-md-6">
+                                                <div class="row">
                                         `;
 
-                                        // 3 bài còn lại dạng small
-                                        for (let i = 1; i < articles.length && i < 4; i++) {
-                                            sectionHTML += createSmallArticleHTML(articles[i]);
+                                        if (articles[0]) {
+                                            sectionHTML += createArticleCardHTML(articles[0], {
+                                                colClass: 'col-12 col-md-6',
+                                                showActions: true
+                                            });
                                         }
+
+                                        // Các bài còn lại dạng small article (chiếm 1/2 chiều rộng)
+                                        sectionHTML += `<div class="col-12 col-md-6">`;
+                                        for (let i = 1; i < articles.length && i < 4; i++) {
+                                            sectionHTML += createSmallArticleHTML(articles[i], {
+                                                showEngagement: false
+                                            });
+                                        }
+                                        sectionHTML += `</div>`; // Đóng col cho small articles
 
                                         sectionHTML += `
                                                 </div>
@@ -275,7 +278,16 @@ require 'auth_processing.php';
                                     loadedSections++;
                                     if (loadedSections === categories.length) {
                                         $('#category-sections').html(sectionsHTML);
+
+                                        // Khởi tạo hệ thống tương tác sau khi tải xong
+                                        if (typeof IndexInteractions !== 'undefined') {
+                                            window.indexInteractions = new IndexInteractions();
+                                        }
                                     }
+                                },
+                                error: function() {
+                                    console.error('Lỗi khi tải bài viết cho danh mục:', category.name);
+                                    loadedSections++;
                                 }
                             });
                         });
@@ -286,8 +298,6 @@ require 'auth_processing.php';
                 }
             });
         }
-
-        
     </script>
 </body>
 

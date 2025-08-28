@@ -269,15 +269,14 @@ body {
 }
 
 .author-avatar {
-  width: 30px;
-  height: 30px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   object-fit: cover;
 }
 
 .engagement-stats {
   display: flex;
-  gap: 1rem;
 }
 
 .editor-picks {

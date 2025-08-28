@@ -110,7 +110,7 @@ function loadSidebarPicks() {
 }
 function loadSidebarHot() {
   $.ajax({
-    url: "/controller/like_controller.php",
+    url: "/controller/interactive.php",
     method: "POST",
     data: {
       action: "getMostLiked",

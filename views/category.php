@@ -17,6 +17,7 @@ $offset = ($page - 1) * $limit;
     <link rel="icon" type="image/png" href="/public/images/logo.png">
     <link rel="stylesheet" href="../public/css/style.css">
     <link rel="stylesheet" href="../public/css/auth.css">
+    <link rel="stylesheet" href="../public/css/interactive.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -223,6 +224,8 @@ $offset = ($page - 1) * $limit;
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/sidebar.js"></script>
     <script src="../public/js/search.js"></script>
+    <script src="../public/js/interactive-helpers.js"></script>
+    <script src="../public/js/interactive-system.js"></script>
     <script>
         const API_URL = '/views/admin/controller/articles.php';
         const categoryId = <?php echo json_encode($category_id); ?>;
@@ -242,37 +245,42 @@ $offset = ($page - 1) * $limit;
         }
 
         // Tạo HTML bài viết
-        function createArticleCardHTML(article) {
+        function createArticleCardHTML(article, options = {}) {
+            const {
+                showExcerpt = true,
+                    showAuthor = true,
+                    showEngagement = true,
+                    colClass = 'col-6 col-md-4'
+            } = options;
+
             return `
-                <div class="col-md-4 col-sm-6 mb-4">
-                    <div class="article-card">
+            <div class="${colClass} mt-24">
+                <div class="article-card">
+                    <a href="article-detail.php?id=${article.id}">
+                        <img src="/public/images/articles/${escapeHtml(article.image_url)}" alt="Article" class="article-image">
+                    </a>
+                    <div class="article-content">
                         <a href="article-detail.php?id=${article.id}">
-                            <img src="/public/images/articles/${article.image_url}" 
-                                 alt="${article.title}" class="article-image">
+                            <h3 class="article-title line-clamp-2">${escapeHtml(article.title)}</h3>
                         </a>
-                        <div class="article-content">
-                            <a href="article-detail.php?id=${article.id}" class="article-title">
-                                ${article.title}
-                            </a>
-                            <p class="article-excerpt">${article.excerpt}</p>
-                            <div class="article-meta d-flex justify-content-between align-items-center">
-                                <div class="author-info d-flex align-items-center">
-                                    <img src="/public/images/authors/${article.author_avatar}" 
-                                         alt="Tác giả" class="author-avatar ">
+                        ${showExcerpt ? `<p class="article-excerpt line-clamp-2">${escapeHtml(article.excerpt)}</p>` : ''}
+                        ${showAuthor ? `
+                            <div class="article-meta">
+                                <div class="author-info">
+                                    <img src="/public/images/authors/${escapeHtml(article.author_avatar)}" alt="Author" class="author-avatar">
                                     <div>
-                                        <div style="font-weight: 600; font-size: 0.7rem;">${article.author_name}</div>
-                                        <div style="font-size: 0.6rem; color: #999;">${formatDate(article.publish_date)}</div>
+                                        <div style="font-weight: 500;">${escapeHtml(article.author_name)}</div>
+                                        <div style="font-size: 10px;">${formatDate(article.publish_date)}</div>
                                     </div>
                                 </div>
-                                <div class="engagement-stats">
-                                    <span><i class="fas fa-thumbs-up"></i> 4</span>
-                                    <span><i class="fas fa-share"></i></span>
-                                </div>
+                                ${showEngagement ? generateEngagementStats(article) : ''}
                             </div>
-                        </div>
+                        ` : ''}
+                        ${!showAuthor && showEngagement ? generateEngagementStats(article) : ''}
                     </div>
                 </div>
-            `;
+            </div>
+        `;
         }
 
         // Tạo phân trang

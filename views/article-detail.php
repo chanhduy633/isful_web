@@ -261,6 +261,21 @@ $conn->close();
             color: white;
             border-color: #007bff;
         }
+
+        /* Bookmark button state */
+        #bookmark-btn.bookmarked,
+        #sticky-bookmark-btn.bookmarked {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        /* Loading state */
+        #bookmark-btn.loading,
+        #sticky-bookmark-btn.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -284,7 +299,7 @@ $conn->close();
                     </div>
                     <div class="author-sticky-actions">
                         <a href="#" class="action-btn" id="sticky-like-btn" title="Thích">
-                            <i class="fas fa-thumbs-up"></i>
+                            <i class="fas fa-heart"></i>
                         </a>
 
                         <a href="#" class="action-btn" id="sticky-bookmark-btn" title="Lưu bài viết">
@@ -341,7 +356,7 @@ $conn->close();
                         <!-- Engagement actions -->
                         <div class="engagement-actions">
                             <button class="engagement-button" id="like-btn" data-article-id="<?php echo $article_id; ?>">
-                                <i class="fas fa-thumbs-up"></i>
+                                <i class="fas fa-heart"></i>
                                 <span>Thích (<span id="likes-count">0</span>)</span>
                             </button>
 
@@ -379,7 +394,7 @@ $conn->close();
     <script src="../public/js/sidebar.js"></script>
     <script src="../public/js/search.js"></script>
 
-     <script>
+    <script>
         class LikeSystem {
             constructor(articleId) {
                 this.articleId = articleId;
@@ -389,6 +404,7 @@ $conn->close();
             init() {
                 this.bindEvents();
                 this.loadLikeStatus();
+                this.loadBookmarkStatus();
             }
 
             bindEvents() {
@@ -405,7 +421,12 @@ $conn->close();
                 });
 
                 // Bookmark button
-                $('#bookmark-btn, #sticky-bookmark-btn').on('click', (e) => {
+                $('#bookmark-btn').on('click', (e) => {
+                    e.preventDefault();
+                    this.toggleBookmark();
+                });
+                // Sticky bookmark button
+                $('#sticky-bookmark-btn').on('click', (e) => {
                     e.preventDefault();
                     this.toggleBookmark();
                 });
@@ -423,7 +444,7 @@ $conn->close();
                 this.setLoading(true);
 
                 try {
-                    const response = await fetch('/controller/like_controller.php', {
+                    const response = await fetch('/controller/interactive.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -453,7 +474,7 @@ $conn->close();
 
             async loadLikeStatus() {
                 try {
-                    const response = await fetch('/controller/like_controller.php', {
+                    const response = await fetch('/controller/interactive.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -478,7 +499,7 @@ $conn->close();
 
                 // Update button states
                 const likeButtons = $('#like-btn, #sticky-like-btn');
-                
+
                 if (userLiked) {
                     likeButtons.addClass('liked');
                     $('#like-btn').find('span').html(`Đã thích (${likesCount})`);
@@ -489,31 +510,31 @@ $conn->close();
             }
 
             showLoginPrompt() {
-    
-    // Hiển thị thông báo trong modal
-    const messageDiv = $('#loginMessage');
-    messageDiv.html('<div class="alert alert-info mb-0">Vui lòng đăng nhập để sử dụng tính năng này.</div>');
 
-    // Mở modal đăng nhập Bootstrap
-    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-    loginModal.show();
-}
+                // Hiển thị thông báo trong modal
+                const messageDiv = $('#loginMessage');
+                messageDiv.html('<div class="alert alert-info mb-0">Vui lòng đăng nhập để sử dụng tính năng này.</div>');
+
+                // Mở modal đăng nhập Bootstrap
+                const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                loginModal.show();
+            }
 
 
-openLoginModal() {
-    // Gọi lại showLoginPrompt để đảm bảo thông báo được hiển thị
-    this.showLoginPrompt();
-}
+            openLoginModal() {
+                // Gọi lại showLoginPrompt để đảm bảo thông báo được hiển thị
+                this.showLoginPrompt();
+            }
 
             toggleBookmark() {
                 const bookmarkBtns = $('#bookmark-btn, #sticky-bookmark-btn');
-                
+
                 // Kiểm tra đăng nhập trước
                 this.checkLoginForAction('bookmark').then((canProceed) => {
                     if (!canProceed) return;
-                    
+
                     const isBookmarked = bookmarkBtns.hasClass('bookmarked');
-                    
+
                     if (isBookmarked) {
                         bookmarkBtns.removeClass('bookmarked');
                         $('#bookmark-btn').find('span').text('Lưu');
@@ -525,10 +546,119 @@ openLoginModal() {
                     }
                 });
             }
+            async toggleBookmark() {
 
+                if ($('#bookmark-btn').hasClass('loading')) {
+                    return;
+                }
+
+                this.setBookmarkLoading(true);
+
+                try {
+                    const response = await fetch('/controller/interactive.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=toggleSave&article_id=${this.articleId}`
+                    });
+
+
+                    if (!response.ok) {
+                        console.error('❌ HTTP error! Status:', response.status);
+                        this.showToast('Lỗi mạng hoặc server.', 'error');
+                        this.setBookmarkLoading(false);
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.updateBookmarkUI(data.saved);
+                        this.showToast(data.message, 'success');
+                    } else {
+                        if (data.require_login) {
+                            this.showLoginPrompt();
+                        } else {
+                            console.error('❌ Backend error:', data.message);
+                            this.showToast(data.message || 'Có lỗi xảy ra', 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('💥 Fetch error:', error);
+                    this.showToast('Không thể kết nối đến server.', 'error');
+                }
+
+                this.setBookmarkLoading(false);
+            }
+
+            async loadBookmarkStatus() {
+
+                try {
+                    const response = await fetch('/controller/interactive.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `action=getSaveStatus&article_id=${this.articleId}`
+                    });
+
+
+                    if (!response.ok) {
+                        console.error('❌ Status check failed:', response.status);
+                        return;
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.updateBookmarkUI(result.data.saved);
+                    } else {
+                        console.warn('⚠️ Failed to load bookmark status:', result.message);
+                    }
+                } catch (error) {
+                    console.error('🚨 Error checking bookmark status:', error);
+                }
+            }
+
+
+            updateBookmarkUI(isBookmarked) {
+
+                const bookmarkBtns = $('#bookmark-btn, #sticky-bookmark-btn');
+                const textSpan = $('#bookmark-btn').find('span');
+
+                if (isBookmarked) {
+                    bookmarkBtns.addClass('bookmarked');
+                    textSpan.text('Đã lưu');
+                    bookmarkBtns.find('i').removeClass('far').addClass('fas');
+                } else {
+                    bookmarkBtns.removeClass('bookmarked');
+                    textSpan.text('Lưu');
+                    bookmarkBtns.find('i').removeClass('fas').addClass('far');
+                }
+;
+            }
+
+            setBookmarkLoading(loading) {
+                const buttons = $('#bookmark-btn, #sticky-bookmark-btn');
+                if (loading) {
+                    buttons.addClass('loading').prop('disabled', true);
+                    buttons.find('i').removeClass('fa-bookmark').addClass('fa-spinner fa-spin');
+                } else {
+                    buttons.removeClass('loading').prop('disabled', false);
+                    buttons.find('i').removeClass('fa-spinner fa-spin').addClass('fa-bookmark');
+
+                    // Restore correct icon based on current state
+                    if (buttons.hasClass('bookmarked')) {
+                        buttons.find('i').addClass('fas').removeClass('far');
+                    } else {
+                        buttons.find('i').addClass('far').removeClass('fas');
+                    }
+                }
+            }
             async checkLoginForAction(actionType) {
                 try {
-                    const response = await fetch('/controller/like_controller.php', {
+                    const response = await fetch('/controller/interactive.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -537,7 +667,7 @@ openLoginModal() {
                     });
 
                     const result = await response.json();
-                    
+
                     if (result.success && !result.data.is_logged_in) {
                         this.showToast(`Vui lòng đăng nhập để ${actionType === 'bookmark' ? 'lưu bài viết' : 'sử dụng tính năng này'}`, 'error');
                         this.showLoginPrompt();

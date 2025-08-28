@@ -1,0 +1,403 @@
+/* Universal Interactive System Styles */
+
+/* Toast Container */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 350px;
+}
+
+.toast {
+    background: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast.success {
+    background: #28a745;
+}
+
+.toast.error {
+    background: #dc3545;
+}
+
+.toast.info {
+    background: #17a2b8;
+}
+
+.toast.warning {
+    background: #ffc107;
+    color: #212529;
+}
+
+/* Interactive Buttons Base Styles */
+.engagement-button,
+.like-btn,
+.bookmark-btn,
+.share-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    outline: none;
+}
+
+.engagement-button:hover,
+.like-btn:hover,
+.bookmark-btn:hover,
+.share-btn:hover {
+    background: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.engagement-button:active,
+.like-btn:active,
+.bookmark-btn:active,
+.share-btn:active {
+    transform: translateY(0);
+}
+
+/* Loading State */
+.engagement-button.loading,
+.like-btn.loading,
+.bookmark-btn.loading,
+.share-btn.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Like Button States */
+.engagement-button.liked,
+.like-btn.liked,
+.engagement-button.active.like-btn,
+.like-btn.active {
+    color: #e74c3c !important;
+}
+
+.engagement-button.liked:hover,
+.like-btn.liked:hover {
+    color: #c0392b !important;
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* Bookmark Button States */
+.engagement-button.bookmarked,
+.bookmark-btn.bookmarked,
+.engagement-button.active.bookmark-btn,
+.bookmark-btn.active {
+    color: #007bff !important;
+}
+
+.engagement-button.bookmarked:hover,
+.bookmark-btn.bookmarked:hover {
+    color: #0056b3 !important;
+    background: rgba(0, 123, 255, 0.1);
+}
+
+/* Share Button */
+.engagement-button.share-btn:hover,
+.share-btn:hover {
+    color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+/* Engagement Stats Container */
+.engagement-stats {
+    /* gap: 15px; */
+    align-items: center;
+}
+
+/* For Article Cards */
+.article-card .engagement-stats {
+
+}
+
+/* For Main Article Overlay (dark background) */
+.main-article .engagement-stats .engagement-button,
+.main-article .engagement-stats .like-btn,
+.main-article .engagement-stats .bookmark-btn,
+.main-article .engagement-stats .share-btn {
+    color: white;
+}
+
+.main-article .engagement-stats .engagement-button:hover,
+.main-article .engagement-stats .like-btn:hover,
+.main-article .engagement-stats .bookmark-btn:hover,
+.main-article .engagement-stats .share-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.main-article .engagement-stats .engagement-button.liked,
+.main-article .engagement-stats .like-btn.liked {
+    color: #ff6b6b !important;
+    background: rgba(255, 107, 107, 0.2);
+    border-color: rgba(255, 107, 107, 0.4);
+}
+
+.main-article .engagement-stats .engagement-button.bookmarked,
+.main-article .engagement-stats .bookmark-btn.bookmarked {
+    color: #4ecdc4 !important;
+    background: rgba(78, 205, 196, 0.2);
+    border-color: rgba(78, 205, 196, 0.4);
+}
+
+/* Sticky Sidebar Styles (for article-detail page) */
+.author-sticky-sidebar {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 15px 0;
+    z-index: 1000;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+}
+
+.author-sticky-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 8px auto;
+    display: block;
+    border: 2px solid #007bff;
+}
+
+.author-sticky-name {
+    font-size: 0.7rem;
+    color: #333;
+    margin-bottom: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50px;
+}
+
+.author-sticky-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-btn {
+    color: #666;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: block;
+    padding: 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    color: #007bff;
+    transform: scale(1.1);
+    background: rgba(0, 123, 255, 0.1);
+    text-decoration: none;
+}
+
+.action-btn.active,
+.action-btn.liked {
+    color: #e74c3c;
+}
+
+.action-btn.bookmarked {
+    color: #007bff;
+}
+
+/* Detailed Engagement Buttons (for article-detail page) */
+.engagement-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+    flex-wrap: wrap;
+}
+
+.engagement-actions .engagement-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    background: white;
+    color: #666;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.engagement-actions .engagement-button:hover {
+    background: #f8f9fa;
+    color: #333;
+    text-decoration: none;
+    border-color: #007bff;
+}
+
+.engagement-actions .engagement-button.active,
+.engagement-actions .engagement-button.liked {
+    background: #e74c3c;
+    color: white;
+    border-color: #e74c3c;
+}
+
+.engagement-actions .engagement-button.bookmarked {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Small Article Engagement */
+.small-article .engagement-stats {
+    font-size: 0.8rem;
+    gap: 10px;
+}
+
+.small-article .engagement-button,
+.small-article .like-btn,
+.small-article .bookmark-btn,
+.small-article .share-btn {
+    padding: 4px 6px;
+    font-size: 0.8rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .author-sticky-sidebar {
+        display: none;
+    }
+    
+    .engagement-stats {
+        gap: 10px;
+    }
+    
+    .engagement-button,
+    .like-btn,
+    .bookmark-btn,
+    .share-btn {
+        padding: 4px 8px;
+        font-size: 0.85rem;
+    }
+    
+    .engagement-actions {
+        gap: 10px;
+    }
+    
+    .engagement-actions .engagement-button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+    
+    #toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .toast {
+        margin-bottom: 5px;
+    }
+}
+
+@media (max-width: 576px) {
+    .engagement-stats {
+        gap: 8px;
+        font-size: 0.8rem;
+    }
+    
+    .engagement-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .engagement-actions .engagement-button {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+/* Icon Animation */
+.engagement-button i,
+.like-btn i,
+.bookmark-btn i,
+.share-btn i,
+.action-btn i {
+    transition: all 0.2s ease;
+}
+
+.engagement-button:hover i,
+.like-btn:hover i,
+.bookmark-btn:hover i,
+.share-btn:hover i,
+.action-btn:hover i {
+    transform: scale(1.1);
+}
+
+.engagement-button.liked i,
+.like-btn.liked i {
+    animation: heartBeat 0.6s ease-in-out;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.2); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.2); }
+    70% { transform: scale(1); }
+}
+
+.engagement-button.bookmarked i,
+.bookmark-btn.bookmarked i {
+    animation: bookmarkFill 0.4s ease-in-out;
+}
+
+@keyframes bookmarkFill {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Spinner Animation for Loading */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
