@@ -10,7 +10,6 @@ if ($article_id <= 0) {
     exit;
 }
 
-// Kết nối database để lấy chi tiết bài viết
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -114,7 +113,9 @@ $conn->close();
         .action-btn.active {
             color: #007bff;
         }
-
+        #sticky-like-btn:hover 
+        { color: #dc3545; 
+        }
         /* Ẩn trên màn hình nhỏ */
         @media (max-width: 768px) {
             .author-sticky-sidebar {
@@ -163,7 +164,7 @@ $conn->close();
             border-radius: 10px;
         }
 
-        .author-info {
+        .author-info-detail {
             display: flex;
             align-items: center;
             gap: 15px;
@@ -262,15 +263,17 @@ $conn->close();
             border-color: #007bff;
         }
 
-        /* Bookmark button state */
         #bookmark-btn.bookmarked,
         #sticky-bookmark-btn.bookmarked {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
+            background: white;
+            color: #007bff;
+        }
+        #like-btn.liked,
+        #sticky-like-btn.liked {
+            background: white;
+            color:  #dc3545;
         }
 
-        /* Loading state */
         #bookmark-btn.loading,
         #sticky-bookmark-btn.loading {
             opacity: 0.7;
@@ -332,7 +335,7 @@ $conn->close();
                     <div class="article-meta">
 
                         <div>
-                            <div class="author-info">
+                            <div class="author-info-detail">
                                 <img src="/public/images/authors/<?php echo htmlspecialchars($article['author_avatar']); ?>"
                                     alt="<?php echo htmlspecialchars($article['author_name']); ?>"
                                     class="author-avatar">
@@ -391,6 +394,7 @@ $conn->close();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="../public/js/auth.js"></script>
+    <script src="../public/js/navbar.js"></script>
     <script src="../public/js/sidebar.js"></script>
     <script src="../public/js/search.js"></script>
 

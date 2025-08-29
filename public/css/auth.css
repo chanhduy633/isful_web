@@ -331,3 +331,9 @@
   transform: none;
   box-shadow: none;
 }
+
+@media (max-width: 767.98px) {
+  .user-info, .auth-buttons, .author-info, #userDropdown {
+    display: none !important;
+  }
+}

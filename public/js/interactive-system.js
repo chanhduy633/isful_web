@@ -451,7 +451,6 @@ $(document).ready(function () {
     if (typeof window.interactiveSystem === "undefined") {
         window.interactiveSystem = new UniversalInteractiveSystem();
         
-        console.log("Interactive system initialized");
     }
 });
 
