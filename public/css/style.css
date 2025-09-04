@@ -135,9 +135,9 @@ body {
   border-radius: 4px;
 }
 .no-result {
-    text-align: center;
-    padding: 15px;
-    color: #999;
+  text-align: center;
+  padding: 15px;
+  color: #999;
 }
 .login-links {
   display: flex;
@@ -788,24 +788,27 @@ body {
 
 /* Responsive Breakpoints */
 @media (max-width: 991.98px) {
-  .user-info, .auth-buttons, .author-info, #userDropdown {
+  .user-info,
+  .auth-buttons,
+  .author-info,
+  #userDropdown {
     display: none !important;
   }
   /* Show mobile menu toggle */
   .mobile-menu-toggle {
     display: block;
   }
-  
+
   /* Hide desktop navigation */
   .navbar-nav.me-auto {
     display: none;
   }
-  
+
   /* Adjust search input width */
   .search-icon-btn.active .search-input {
     width: 200px;
   }
-  
+
   /* Adjust navbar brand */
   .navbar-brand {
     margin-left: 0.5rem;
@@ -817,12 +820,12 @@ body {
   .search-icon-btn.active .search-input {
     width: 100%;
   }
-  
+
   .container-custom {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
+
   .navbar {
     padding: 0.5rem 0;
   }
@@ -833,12 +836,12 @@ body {
   .search-icon-btn.active .search-input {
     width: 100%;
   }
-  
+
   .mobile-menu {
     width: 100%;
     left: -100%;
   }
-  
+
   .container-custom {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
@@ -867,3 +870,4 @@ body {
   outline: 2px solid var(--mint-green);
   outline-offset: 2px;
 }
+

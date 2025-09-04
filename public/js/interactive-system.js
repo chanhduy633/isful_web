@@ -360,7 +360,6 @@ class UniversalInteractiveSystem {
         if (!articleId) return;
 
         try {
-            // Load both like and save status in one bulk request
             const response = await fetch("/controller/interactive.php", {
                 method: "POST",
                 headers: {

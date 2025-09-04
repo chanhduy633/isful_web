@@ -16,6 +16,9 @@ $get = isset($_GET["page"]) ? $_GET["page"] : "";
 
     <link rel="stylesheet" href="../public/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="../public/css/style.css?v=1.0.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
     <style>
         .navbar a {
@@ -87,6 +90,17 @@ $get = isset($_GET["page"]) ? $_GET["page"] : "";
                                 Quản lý người dùng
                             </a>
                         </li>
+                        <!-- Menu quản lý tuyển dụng -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="/views/admin.php?page=manage_recruitment">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="currentColor" class="bi bi-people">
+                                    <path d="M5 8c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2zm14 0c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2zm-6 2c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2zm-8 1c-1.105 0-2 .895-2 2v5h4v-5c0-1.105-.895-2-2-2zm14 0c-1.105 0-2 .895-2 2v5h4v-5c0-1.105-.895-2-2-2zm-7 1c-1.105 0-2 .895-2 2v5h4v-5c0-1.105-.895-2-2-2z" />
+                                </svg>
+                                Quản lý tuyển dụng
+                            </a>
+                        </li>
+
 
 
 
@@ -129,6 +143,9 @@ $get = isset($_GET["page"]) ? $_GET["page"] : "";
                 }
                 if ($get == "order") {
                     include("../views/admin/order/manageorders.php");
+                }
+                if ($get == "manage_recruitment" && $_SESSION["role"] == 'admin') {
+                    include("../views/admin/recruitment/manage_recruitment.php");
                 }
                 ?>
             </main>

@@ -1,3 +1,4 @@
+
 <!-- Header with Mobile Menu -->
 <section class="header">
     <div class="container-custom">
@@ -8,16 +9,31 @@
             </button>
 
             <!-- Logo -->
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="index.php">
                 <img class="img-fluid" src="../public/images/logo.png" alt="logo">
             </a>
 
             <!-- Desktop Navigation -->
             <ul class="navbar-nav me-auto">
-                <li><a class="nav-link" href="index.php"><i class="fas fa-home"></i> Home</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="homeDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="homeDropdown" id="homeCategories">
+                        <li>
+                            <div class="dropdown-loading">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <span class="ms-2">Đang tải danh mục...</span>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
                 <li><a class="nav-link" href="toppick.php"><i class="fas fa-fire"></i> Top pick</a></li>
                 <li><a class="nav-link" href="#"><i class="fas fa-comments"></i> Insight</a></li>
-                <li><a class="nav-link" href="#"><i class="fas fa-briefcase"></i> Tuyển Dụng</a></li>
+                <li><a class="nav-link" href="recruitment.php"><i class="fas fa-briefcase"></i> Tuyển Dụng</a></li>
                 <li><a class="nav-link" href="#"><i class="fas fa-clock"></i> Study</a></li>
             </ul>
 
@@ -29,7 +45,7 @@
                     <input type="text" class="search-input" placeholder="Tìm kiếm..." />
                     <div class="search-results"></div>
                 </div>
-                
+
                 <?php if (isset($_SESSION['userid'])): ?>
                     <!-- Desktop User Menu -->
                     <div class="nav-item dropdown">
@@ -47,10 +63,14 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="/views/user.php"><i class="fas fa-user me-2"></i>Thông tin cá nhân</a></li>
                             <?php if ($_SESSION['role'] === 'admin'): ?>
-                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
                                 <li><a class="dropdown-item" href="/views/admin.php?page=category"><i class="fas fa-shield-alt me-2"></i>Quản trị</a></li>
                             <?php endif; ?>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li><a class="dropdown-item" href="?action=logout"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
                         </ul>
                     </div>
@@ -95,6 +115,7 @@
                     <i class="fas fa-home"></i>
                     <span>Home</span>
                 </a>
+            </li>
             </li>
             <li class="mobile-nav-item">
                 <a href="toppick.php" class="mobile-nav-link">
@@ -144,7 +165,7 @@
                     <i class="fas fa-user"></i>
                     <span>Thông tin cá nhân</span>
                 </a>
-                
+
                 <?php if ($_SESSION['role'] === 'admin'): ?>
                     <a href="/views/admin.php?page=category" class="mobile-user-link">
                         <i class="fas fa-shield-alt"></i>

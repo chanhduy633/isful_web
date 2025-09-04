@@ -65,7 +65,7 @@ require 'auth_processing.php';
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/navbar.js"></script>
     <script src="../public/js/sidebar.js"></script>
-    <script src="../public/js/search.js"></script>
+    <script src="../public/js/header.js"></script>
     <script src="../public/js/interactive-system.js"></script>
     <script src="../public/js/interactive-helpers.js"></script>
     <?php

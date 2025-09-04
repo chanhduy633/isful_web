@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_user'])) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($users as $user): ?>
+                <?php foreach ($users as $user): ?> 
                     <tr>
                         <td><?= $user['id']; ?></td>
                         <td><?= htmlspecialchars($user['username']); ?></td>

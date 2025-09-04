@@ -98,7 +98,10 @@ function handleCredentialResponse(response) {
 
 // Reset form khi mở modal
 $(".modal").on("show.bs.modal", function () {
-  $(this).find("form")[0].reset();
+  const form = $(this).find("form")[0];
+if (form) {
+    form.reset();
+}
   $(this).find(".alert").remove();
 });
 

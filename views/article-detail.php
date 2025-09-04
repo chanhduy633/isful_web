@@ -396,7 +396,7 @@ $conn->close();
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/navbar.js"></script>
     <script src="../public/js/sidebar.js"></script>
-    <script src="../public/js/search.js"></script>
+    <script src="../public/js/header.js"></script>
 
     <script>
         class LikeSystem {

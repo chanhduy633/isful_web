@@ -13,6 +13,7 @@ require 'auth_processing.php';
     <link rel="icon" type="image/png" href="/public/images/logo.png">
     <link rel="stylesheet" href="../public/css/style.css">
     <link rel="stylesheet" href="../public/css/auth.css">
+    <link rel="stylesheet" href="../public/css/interactive.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -57,7 +58,9 @@ require 'auth_processing.php';
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/navbar.js"></script>
     <script src="../public/js/sidebar.js"></script>
-    <script src="../public/js/search.js"></script>
+    <script src="../public/js/header.js"></script>
+    <script src="../public/js/interactive-helpers.js"></script>
+    <script src="../public/js/interactive-system.js"></script>
 
     <script>
         // Load trang khi document ready
@@ -92,14 +95,7 @@ require 'auth_processing.php';
                         <div class="article-content">
                             <a href="article-detail.php?id=${article.id}"><h3 class="article-title">${article.title}</h3></a>
                             <p class="article-excerpt">${article.excerpt}</p>
-                            <div class="article-meta">
-                                <div class="engagement-stats">
-                                    <span><i class="fas fa-thumbs-up"></i> ${article.likes || 4}</span>
-                                    <span><i class="fas fa-bookmark"></i></span>
-                                    <span><i class="fas fa-share"></i></span>
-
-                                </div>
-                            </div>
+                            ${generateEngagementStats(article, { theme: 'dark' })}
                         </div>
                     </div>
                 </div>
