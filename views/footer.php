@@ -3,18 +3,9 @@
      <div class="container-custom">
          <div class="row">
              <!-- License information column -->
-             <div class="col-lg-4 mb-4">
-                 <h3 class="mb-3" style="color: var(--dark-blue); font-weight:700;">Insightful </h3>
-                 <p class="license-info">
-                     Giấy phép ĐKD số G314B5-496 do Sở KH & ĐT cấp ngày 06/01/2017.
-                 </p>
-                 <p class="license-info">
-                     Giấy phép MNI số 388/cp-BTTTI kỳ ngày 17/09/2020.
-                 </p>
-             </div>
-
+             
              <!-- You Might Like column -->
-             <div class="col-lg-2 col-md-4 mb-4">
+             <div class="col-lg-4 col-md-4 mb-4">
                  <h5 class="section-title">You Might Like</h5>
                  <div class="footer-links">
                      <a href="#">Longform</a>
@@ -25,7 +16,7 @@
              </div>
 
              <!-- Explore column -->
-             <div class="col-lg-2 col-md-4 mb-4">
+             <div class="col-lg-4 col-md-4 mb-4">
                  <h5 class="section-title">Explore</h5>
                  <div class="footer-links">
                      <a href="#">About Us</a>

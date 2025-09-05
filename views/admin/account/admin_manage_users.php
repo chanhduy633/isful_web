@@ -1,4 +1,5 @@
 <?php
+
 $host = 'localhost';
 $db   = 'websiteblog';
 $user = 'root';
@@ -56,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_user'])) {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,7 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_user'])) {
     <title>Quản lý tài khoản</title>
     <link rel="stylesheet" href="../../../public/css/bootstrap.min.css">
 </head>
-
 <body>
     <div class="container">
         <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">

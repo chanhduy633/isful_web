@@ -32,9 +32,8 @@
                     </ul>
                 </li>
                 <li><a class="nav-link" href="toppick.php"><i class="fas fa-fire"></i> Top pick</a></li>
-                <li><a class="nav-link" href="#"><i class="fas fa-comments"></i> Insight</a></li>
                 <li><a class="nav-link" href="recruitment.php"><i class="fas fa-briefcase"></i> Tuyển Dụng</a></li>
-                <li><a class="nav-link" href="#"><i class="fas fa-clock"></i> Study</a></li>
+                <li><a class="nav-link" href="study.php"><i class="fas fa-clock"></i> Study</a></li>
             </ul>
 
             <!-- Desktop Right Side -->
